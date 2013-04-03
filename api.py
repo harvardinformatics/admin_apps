@@ -21,6 +21,6 @@ class BillingRecordResource(ModelResource):
             'payment_code': ('exact', 'endswith'),
             'bill_date': ('gte', 'lt'),
             }
-        #authentication = BasicAuthentication()
+        authentication = BasicAuthentication()
         #authorization = DjangoAuthorization()
-        authorization= Authorization()
+        #authorization= Authorization()

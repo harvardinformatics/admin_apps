@@ -3,6 +3,7 @@ import urllib, urllib2
 import json
 from datetime import datetime
 from django.utils.timezone import utc
+import base64
 
 base_url = 'localhost:8000'
 
