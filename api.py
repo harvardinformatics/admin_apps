@@ -22,5 +22,5 @@ class BillingRecordResource(ModelResource):
             'bill_date': ('gte', 'lt'),
             }
         authentication = BasicAuthentication()
-        #authorization = DjangoAuthorization()
         #authorization= Authorization()
+        authorization = DjangoAuthorization()
