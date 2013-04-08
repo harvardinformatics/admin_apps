@@ -38,6 +38,7 @@ def get_br_context(request, filters=None):
             brs = brs.filter(bill_date__gte=month_start, bill_date__lt=month_end)
     return Context({ 'brs': brs })
 
+#@login_required
 def index(request):
     filters = check_querystring(request)
     dd = get_br_context(request, filters)
@@ -46,6 +47,7 @@ def index(request):
                               dd, 
                               context_instance=RequestContext(request))
 
+#@login_required
 def pdf(request):
     filters = check_querystring(request)
     dd = get_br_context(request, filters)

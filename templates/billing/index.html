@@ -50,7 +50,7 @@ Home Page.
    <table id="billing_record_list">
      <thead>
      <tr class="header_row">
-       <th>Name</th>
+       <th style="width: 20%;">Name</th>
        <th>Payment Code</th>
        <th>Amount</th>
        <th>Date</th>
@@ -61,7 +61,7 @@ Home Page.
      {% for br in brs %}
      <tr class="br_row">
        <td>{{ br.name }}</td>
-       <td>{{ br.payment_code }} | <a href="?ec_root={{ br.payment_code|slice:'34:' }}">This Root Only</a> | 
+       <td>{{ br.payment_code }}<br /><a href="?ec_root={{ br.payment_code|slice:'34:' }}">This Root Only</a> | 
 	 <a href="?expense_code={{ br.payment_code }}">This Code Only</a></td>
        <td>${{ br.amount }}</td>
        <td>{{ br.bill_date|date }}</td>
