@@ -1,5 +1,6 @@
 *.pyc
 *.egg-info
+*.db
 admin_apps/settings/local.py
 admin_apps/settings/local/*
 docs/_build
