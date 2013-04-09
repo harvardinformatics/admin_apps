@@ -52,7 +52,7 @@ def pdf(request):
     filters = check_querystring(request)
     dd = get_br_context(request, filters)
     template = 'billing/index_pdf.html'
-    return utils.render_to_pdf_response('billing/index_pdf.html', dd)
+    return utils.render_to_pdf_response('billing/index_pdf.html', dd, 'invoice.pdf')
 
 def check_querystring(request):
     filters = {}
