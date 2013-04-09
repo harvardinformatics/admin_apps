@@ -14,7 +14,6 @@ framework.
 
 """
 import os
-
 os.environ.setdefault("DJANGO_SETTINGS_MODULE",
                       "admin_apps.settings.local")
 
