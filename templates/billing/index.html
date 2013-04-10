@@ -25,8 +25,11 @@ Home Page.
         "bAutoWidth": false
     } );
 
-    var pdf_url = document.URL.replace("/?", "/pdf/?");
-    $('#pdf_link').attr("href", pdf_url)
+    var last_slash = document.URL.lastIndexOf("/");
+    var first_part = document.URL.substring(0, last_slash);
+    var last_part = document.URL.substring(last_slash, document.URL.length);
+    var new_url = first_part + "/pdf" + last_part;
+    $('#pdf_link').attr("href", new_url)
   } );
 </script>
 {% endblock %}

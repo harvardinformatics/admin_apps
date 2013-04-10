@@ -6,7 +6,7 @@ urlpatterns = patterns('billing_record.views',
    #pdf
    url(r'^pdf/$', 'pdf'),
 
-   url(r'^generate_html_doc/$', 'generate_html_doc'),
-   #url(r'^generate_pdf_doc/$', 'generate_pdf_doc'),
+   (r'^generate_doc/$', 'generate_doc'),
+   (r'^generate_doc/(?P<file_format>\w+)/$', 'generate_doc'),
 
 )
