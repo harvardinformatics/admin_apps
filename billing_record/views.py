@@ -7,11 +7,13 @@ from billing_record.models import *
 from datetime import datetime, date, timedelta
 from django.utils.timezone import utc
 from django_xhtml2pdf import utils
+from django.views.decorators.csrf import csrf_exempt
 import re
 
 import sys
 import urllib, urllib2
 import json
+import base64
 
 def get_br_context(request, filters=None):
     #get all bills
@@ -83,20 +85,27 @@ def check_querystring(request):
                 filters.update({ key: value })
     return filters
 
-def generate_html_doc(request):
-    url = 'http://dokken.rc.fas.harvard.edu/a/api/document/?format=json'
-    data = {
-        'username': request.user.username,
-        'password': request.user.password,
-        'request_url': 'http://' + request.get_host() + request.get_full_path(),
-        }
-    req = urllib2.Request(url)
-    json_data = json.dumps(data)
-    req.add_data(json_data) 
-    req.add_header('Content-Type', 'application/json')
-    req.add_header('Accept', 'application/json, text/html')
+@csrf_exempt
+def generate_doc(request, file_format='html'):
+    if not file_format in ('html', 'pdf'):
+        file_format = 'html'
+    url = 'http://dokken.rc.fas.harvard.edu/harvard_doc/' + file_format + '/'
+    request_url = ''.join(['http://', request.get_host(), request.get_full_path()]) 
+    data = urllib.urlencode({
+            'request_url': request_url,
+            })
+    req = urllib2.Request(url, data)
+    #req.add_data(json_data)
+    #req.add_data(data)
+    #req.add_header('Content-Type', 'application/json')
+    #req.add_header('Accept', 'application/json, text/html')
+    #username = request.user.username
+    #password = request.user.password
+    #base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
+    #req.add_header("Authorization", "Basic %s" % base64string)
 
-    response = urllib2.urlopen(req)                       #open the url request object and capture the response
+    #response = urllib2.urlopen(req)                       #open the url request object and capture the response
+    response = urllib.urlopen(url, data)                       #open the url request object and capture the response
     output = response.read()                                  #read the string response
     print output
     return render_to_response('billing/index.html', data, context_instance=RequestContext(request))
