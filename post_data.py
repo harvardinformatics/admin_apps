@@ -7,7 +7,7 @@ from django.utils.timezone import utc
 import base64
 
 if len(sys.argv) < 4 or len(sys.argv) > 5:
-    print "Usage: python post_data.py http://127.0.0.1:8000/a/api/billingrecord/ <username> <password> [<data_dictionary>]"
+    print "Usage: python post_data.py http://billy.rc.fas.harvard.edu/a/api/billingrecord/ <username> <password> [<data_dictionary>]"
     sys.exit()
 
 url = sys.argv[1]

@@ -1,5 +1,5 @@
 from django.shortcuts import render_to_response
-from django.http import HttpResponse, HttpRequest
+from django.http import HttpResponse
 #from django.contrib.auth.decorators import login_required
 #from django.contrib.auth import logout
 from django.template import RequestContext, loader, Context
@@ -8,10 +8,6 @@ from datetime import datetime, date, timedelta
 from django.utils.timezone import utc
 from django_xhtml2pdf import utils
 import re
-
-import sys
-import urllib, urllib2
-import json
 
 def get_br_context(request, filters=None):
     #get all bills
@@ -82,21 +78,3 @@ def check_querystring(request):
             if pattern.match(value):
                 filters.update({ key: value })
     return filters
-
-def generate_html_doc(request):
-    url = 'http://dokken.rc.fas.harvard.edu/a/api/document/?format=json'
-    data = {
-        'username': request.user.username,
-        'password': request.user.password,
-        'request_url': 'http://' + request.get_host() + request.get_full_path(),
-        }
-    req = urllib2.Request(url)
-    json_data = json.dumps(data)
-    req.add_data(json_data) 
-    req.add_header('Content-Type', 'application/json')
-    req.add_header('Accept', 'application/json, text/html')
-
-    response = urllib2.urlopen(req)                       #open the url request object and capture the response
-    output = response.read()                                  #read the string response
-    print output
-    return render_to_response('billing/index.html', data, context_instance=RequestContext(request))
