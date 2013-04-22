@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% comment %}
+Home Page.
+{% endcomment %}
+
+{% block title %}
+    Bill Listing
+{% endblock %}
+
+{% block head %}
+<style type="text/css" title="currentStyle">
+  @import "/static/js/datatables/media/css/demo_page.css";
+</style>
+<script type="text/javascript" language="javascript" src="/static/js/datatables/media/js/jquery.js"></script>
+{% endblock %}
+
+{% block content %}
+   <h1>Billing Record Detail</h1>
+
+   <div class="float-right" style="margin-bottom: 1em;">
+   <a href="/billing/">Back to Listing</a>
+   </div>
+
+   <table id="billing_record_list">
+     <thead>
+     <tr class="header_row">
+       <th style="width: 20%;">Name</th>
+       <th>Payment Code</th>
+       <th>Amount</th>
+       <th>Date</th>
+     </tr>
+     </thead>
+
+     <tbody>
+     {% for br in brs %}
+     <tr class="br_row">
+       <td>{{ br.name }}</td>
+       <td>{{ br.payment_code }}<br /><a href="?ec_root={{ br.payment_code|slice:'34:' }}">This Root Only</a> | 
+	 <a href="?expense_code={{ br.payment_code }}">This Code Only</a></td>
+       <td>${{ br.amount }}</td>
+       <td>{{ br.bill_date|date }}</td>
+     </tr>
+     {% endfor %}
+     </tbody>
+   </table>
+
+   <a href="" id="pdf_link" class="float-right">PDF Version</a>
+
+{% endblock %}

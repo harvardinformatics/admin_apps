@@ -24,6 +24,12 @@ Home Page.
         "bInfo": false,
         "bAutoWidth": false
     } );
+
+    var last_slash = document.URL.lastIndexOf("/");
+    var first_part = document.URL.substring(0, last_slash);
+    var last_part = document.URL.substring(last_slash, document.URL.length);
+    var new_url = first_part + "/pdf" + last_part;
+    $('#pdf_link').attr("href", new_url)
   } );
 </script>
 {% endblock %}
@@ -44,7 +50,7 @@ Home Page.
    <a href="?month=10">Oct</a> |
    <a href="?month=11">Nov</a> |
    <a href="?month=12">Dec</a> |
-   <a href="?">Year</a>
+   <a href="?">All</a>
    </div>
 
    <table id="billing_record_list">
@@ -69,5 +75,7 @@ Home Page.
      {% endfor %}
      </tbody>
    </table>
+
+   <a href="" id="pdf_link" class="float-right">PDF Version</a>
 
 {% endblock %}
