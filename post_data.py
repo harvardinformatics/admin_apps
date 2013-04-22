@@ -25,7 +25,7 @@ else:
         'bill_date': now,
         'created': now,
         'modified': now,
-        'name': 'CDs',
+        'name': 'Tapes',
         'payment_code': '123-12345-4444-666666-123455-1234-99999',
         'user': '/a/api/user/1/'
         }
@@ -50,5 +50,5 @@ else:
 
 """
 Example:
-python post_data.py http://localhost:8000/a/api/billingrecord/ billyidol apiswithoutaface "{\"amount\": 30, \"bill_date\": \"2013-04-08 15:22:01.478283+00:00\", \"created\": \"2013-04-08 17:22:01.478283+00:00\", \"modified\": \"2013-04-09 11:22:01.478283+00:00\", \"payment_code\": \"123-12345-1234-123456-123456-1234-12345\", \"name\": \"Bryan Adams Mix Tape\", \"user\": \"/a/api/user/1/\"}"
+python post_data.py http://billy.rc.fas.harvard.edu/a/api/billingrecord/ billyidol apiswithoutaface "{\"amount\": 30, \"bill_date\": \"2013-04-08 15:22:01.478283+00:00\", \"created\": \"2013-04-08 17:22:01.478283+00:00\", \"modified\": \"2013-04-09 11:22:01.478283+00:00\", \"payment_code\": \"123-12345-1234-123456-123456-1234-12345\", \"name\": \"Bryan Adams Mix Tape\", \"user\": \"/a/api/user/1/\"}"
 """
