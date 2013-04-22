@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% comment %}
+Home Page.
+{% endcomment %}
+
+{% block title %}
+    Bill Listing
+{% endblock %}
+
+{% block head %}
+<style type="text/css" title="currentStyle">
+  @import "/static/js/datatables/media/css/demo_page.css";
+  @import "/static/js/datatables/media/css/jquery.dataTables.css";
+</style>
+<script type="text/javascript" language="javascript" src="/static/js/datatables/media/js/jquery.js"></script>
+<script type="text/javascript" language="javascript" src="/static/js/datatables/media/js/jquery.dataTables.js"></script>
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function() {
+    $('#billing_record_detail').dataTable( {
+        "bPaginate": false,
+        "bLengthChange": false,
+        "bFilter": true,
+        "bSort": false,
+        "bInfo": false,
+        "bAutoWidth": false
+    } );
+  } );
+</script>
+{% endblock %}
+
+{% block content %}
+   <h1>Billing Record Detail</h1>
+
+   <div class="float-right" style="margin-bottom: 1em;">
+   <a href="/billing/">Back to Listing</a>
+   </div>
+
+   <table id="billing_record_detail">
+     <tbody>
+     <tr>
+       <td class="detail_header">Name: </td>
+       <td class="detail_value">{{ br.name }}</td>
+     </tr>
+     <tr>
+       <td class="detail_header">Payment Code: </td>
+       <td class="detail_value">{{ br.payment_code }}</td>
+     </tr>
+     <tr>
+       <td class="detail_header">Amount: </td>
+       <td class="detail_value">${{ br.amount }}</td>
+     </tr>
+     <tr>
+       <td class="detail_header">Bill Date: </td>
+       <td class="detail_value">{{ br.bill_date }}</td>
+     </tr>
+     <tr>
+       <td class="detail_header">Notes: </td>
+       <td class="detail_value">{{ br.notes }}</td>
+     </tr>
+     <tr>
+       <td class="detail_header">Created By: </td>
+       <td class="detail_value">{{ br.user.first_name }} {{ br.user.last_name }}</td>
+     </tr>
+     <tr>
+       <td class="detail_header">Created Date: </td>
+       <td class="detail_value">{{ br.created }}</td>
+     </tr>
+     <tr>
+       <td class="detail_header">Last Modified Date: </td>
+       <td class="detail_value">{{ br.modified }}</td>
+     </tr>
+     </tbody>
+   </table>
+
+{% endblock %}
