@@ -32,7 +32,6 @@ INSTALLED_APPS = (
 
     'tastypie',
     'south',
-    'facility',
     'billing_record',
     'django.contrib.auth',
     'django.contrib.contenttypes',

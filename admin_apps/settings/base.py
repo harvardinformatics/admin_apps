@@ -2,7 +2,6 @@
 # Import global settings to make it easier to extend settings.
 from django.conf.global_settings import *   # pylint: disable=W0614,W0401
 import south
-import facility
 import billing_record
 
 #==============================================================================
@@ -32,7 +31,6 @@ INSTALLED_APPS = (
 
     'tastypie',
     'south',
-    'facility',
     'billing_record',
     'django.contrib.auth',
     'django.contrib.contenttypes',
