@@ -2,6 +2,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpRequest
 #from django.contrib.auth.decorators import login_required
 #from django.contrib.auth import logout
+from django.db.models import Sum
 from django.template import RequestContext, loader, Context
 from billing_record.models import *
 from datetime import datetime, date, timedelta
@@ -42,7 +43,9 @@ def get_br_context(request, filters=None):
                 year = year + 1
             month_end = datetime(year, next_month, 1).replace(tzinfo=utc)
             brs = brs.filter(bill_date__gte=month_start, bill_date__lt=month_end)
-    return Context({ 'brs': brs })
+    print brs
+    total = brs.aggregate(Sum('amount'))['amount__sum']
+    return Context({ 'brs': brs, 'total': total })
 
 #@login_required
 def index(request):

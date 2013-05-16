@@ -1,4 +1,4 @@
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpRequest
 #from django.contrib.auth.decorators import login_required
 #from django.contrib.auth import logout
@@ -52,6 +52,12 @@ def index(request):
     return render_to_response('billing/index.html', 
                               dd, 
                               context_instance=RequestContext(request))
+
+#@login_required
+def detail(request, billing_record_id):
+    br = get_object_or_404(BillingRecord, pk=billing_record_id)
+    dd = {'br': br}
+    return render_to_response('billing/detail.html', dd, context_instance=RequestContext(request))
 
 #@login_required
 def pdf(request):
