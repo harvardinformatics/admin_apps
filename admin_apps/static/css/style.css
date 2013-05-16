@@ -9,6 +9,10 @@ body {
   float: right;
 }
 
+.align-right {
+  text-align: right;
+}
+
 .detail_header {
   text-align: right;
   font-weight: bold;

@@ -51,9 +51,10 @@ Home Page.
       var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
       for(var i = 0; i < hashes.length; i++)
       {
-        hash = hashes[i].split('=');
-        vars.push(hash[0]);
-        vars[hash[0]] = hash[1];
+	alert(hashes[i]);
+	//hash = hashes[i].split('=');
+        //vars.push(hash[0]);
+        //vars[hash[0]] = hash[1];
       }
       return vars;
     }
@@ -61,17 +62,30 @@ Home Page.
     $('.filter').click(
       function(event) {
         event.preventDefault();
-        var query_vars = getUrlVars();
-	//alert(query_vars);
-	var requested_filter = $(this).attr('href');
-	requested_filter_key = requested_filter.split("=")[0];
-	requested_filter_value = requested_filter.split("=")[1];
-	alert(requested_filter_value);
-	query_vars[requested_filter_key] = requested_filter_value;
-	for (var i = 0; i < query_vars.length; i++) {
-	  alert(i);
-	  alert(query_vars[i]);
+	/* 
+	Check if the new filter is in the existing filter.  
+	If it is, remove the existing version and append the new filter.
+        Then splice the whole thing back together.
+        */
+	var new_filter = $(this).attr('href');
+	alert(new_filter);
+	var new_filter_key = new_filter.split("=")[0];
+	var new_filter_value = new_filter.split("=")[1];
+	var hashes = [];
+	if (window.location.href.indexOf('?') != -1) {
+	  hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+        }
+	alert(hashes);
+	for (var i = 0; i < hashes.length; i++) {
+	  var hash = hashes[i].split("=");
+	  //special case: remove full expense code if ec_root is checked
+	  if ((new_filter_key == "ec_root") && (hash[0] == "expense_code") || (hash[0] == new_filter_key)) {
+	    hashes.splice(i, 1);
+	  }
 	}
+	hashes.push(new_filter);
+	var new_querystring = "?" + hashes.join("&");
+	location.replace(new_querystring);
       }
     );
 
@@ -100,7 +114,7 @@ Home Page.
    <a href="month=10" class="filter">Oct</a> |
    <a href="month=11" class="filter">Nov</a> |
    <a href="month=12" class="filter">Dec</a> |
-   <a href="" class="filter">All</a>
+   <a href="/billing/">All</a>
    </div>
 
    <table id="billing_record_list">

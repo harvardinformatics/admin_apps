@@ -1,7 +1,7 @@
 body {
   font-family: verdana, sans-serif;
   font-size: .8em;
-  margin: 1em 10%;
+  margin: 1em 5%;
   color: #333;
 }
 
@@ -18,4 +18,12 @@ body {
 
 .detail_value {
   background-color: #ff9;
+}
+
+.bold {
+  font-weight: 900;
+}
+
+.no-underline {
+  text-decoration: none;
 }
