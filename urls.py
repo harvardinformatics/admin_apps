@@ -19,6 +19,7 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     (r'^billing/', include('billing_record.urls')),
     (r'^a/', include(api.urls)),
+    #(r'^example_data.js', ),
 )
 
 if settings.DEBUG and settings.MEDIA_ROOT:

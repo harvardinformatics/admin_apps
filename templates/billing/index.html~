@@ -68,14 +68,12 @@ Home Page.
         Then splice the whole thing back together.
         */
 	var new_filter = $(this).attr('href');
-	alert(new_filter);
 	var new_filter_key = new_filter.split("=")[0];
 	var new_filter_value = new_filter.split("=")[1];
 	var hashes = [];
 	if (window.location.href.indexOf('?') != -1) {
 	  hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
         }
-	alert(hashes);
 	for (var i = 0; i < hashes.length; i++) {
 	  var hash = hashes[i].split("=");
 	  //special case: remove full expense code if ec_root is checked
@@ -99,9 +97,7 @@ Home Page.
 {% endblock %}
 
 {% block content %}
-   <h1>Bill Listing</h1>
-
-   <div class="float-right" style="margin-bottom: 1em;">
+   <div class="align-right" style="margin-bottom: 1em;">
    <a href="month=1" class="filter">Jan</a> |
    <a href="month=2" class="filter">Feb</a> |
    <a href="month=3" class="filter">Mar</a> |
@@ -116,6 +112,24 @@ Home Page.
    <a href="month=12" class="filter">Dec</a> |
    <a href="/billing/">All</a>
    </div>
+
+   <div id="bill_content">
+   <h1>Bill Listing{% if display_filters %} - 
+       {% if display_filters.month %}
+         {{ display_filters.month|date:"N" }},
+       {% endif %}
+       {% if display_filters.year %}
+         {{ display_filters.year }}
+       {% endif %}
+       {% if display_filters.expense_code %}
+         <br />Exp. Code: {{ display_filters.expense_code }}
+       {% endif %}
+       {% if display_filters.ec_root %}
+         <br />Exp. Code Root: {{ display_filters.ec_root }}
+       {% endif %}
+       
+     {% endif %}
+   </h1>
 
    <table id="billing_record_list">
      <thead>
@@ -142,9 +156,13 @@ Home Page.
      </tbody>
    </table>
 
-   <div class="float-right">
-     <p><span id="total" class="bold">Total: ${{ total }}</span></p>
-     <p><a href="" id="pdf_link">PDF Version</a></p>
+   <div class="align-right">
+     <span id="total" class="bold">Total: ${{ total }}</span>
+   </div>
+   </div> <!-- end bill_content -->
+
+   <div class="align-right">
+     <a href="" id="pdf_link">PDF Version</a>
    </div>
 
 {% endblock %}

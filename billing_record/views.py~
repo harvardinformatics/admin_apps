@@ -20,32 +20,39 @@ def get_br_context(request, filters=None):
     #get all bills
     dd = {}
     brs = BillingRecord.objects.all().order_by('-bill_date')
+    display_filters = {}
+
+    #initialize the year to be the current year.  If it shows up in the filters, use that instead.
+    year = datetime.now().replace(tzinfo=utc).year
+    display_filters.update({ 'year': year });
     for key, value in filters.iteritems():
         if key == 'expense_code':
+            display_filters.update({ 'expense_code': value });
             brs = brs.filter(payment_code=value)
         if key == 'ec_root':
+            display_filters.update({ 'ec_root': value });
             brs = brs.filter(payment_code__endswith=value)
         if key == 'year':
+            display_filters.update({ 'year': value });
             year = int(value)
             year_start = datetime(year, 1, 1).replace(tzinfo=utc)
             year_end = datetime(year + 1, 1, 1).replace(tzinfo=utc)
             brs = brs.filter(bill_date__gte=year_start, bill_date__lt=year_end)
         if key == 'month':
+            display_filters.update({ 'month': value });
             month = int(value)
             if 'year' in filters.keys():
                 year = filters['year']
-            else:
-                year = datetime.now().replace(tzinfo=utc).year
             month_start = datetime(year, month, 1).replace(tzinfo=utc)
+            display_filters.update({ 'month': month_start });
             next_month = month + 1
             if next_month == 13:
                 next_month = 1
                 year = year + 1
             month_end = datetime(year, next_month, 1).replace(tzinfo=utc)
             brs = brs.filter(bill_date__gte=month_start, bill_date__lt=month_end)
-    print brs
     total = brs.aggregate(Sum('amount'))['amount__sum']
-    return Context({ 'brs': brs, 'total': total })
+    return Context({ 'brs': brs, 'total': total, 'display_filters': display_filters, })
 
 #@login_required
 def index(request):
