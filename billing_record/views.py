@@ -52,6 +52,8 @@ def get_br_context(request, filters=None):
             month_end = datetime(year, next_month, 1).replace(tzinfo=utc)
             brs = brs.filter(bill_date__gte=month_start, bill_date__lt=month_end)
     total = brs.aggregate(Sum('amount'))['amount__sum']
+    if not total:
+        total = 0
     return Context({ 'brs': brs, 'total': total, 'display_filters': display_filters, })
 
 #@login_required
