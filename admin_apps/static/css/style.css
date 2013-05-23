@@ -1,11 +1,16 @@
 body {
   font-family: verdana, sans-serif;
-  margin: 1em 10%;
+  font-size: .8em;
+  margin: 1em 5%;
   color: #333;
 }
 
 .float-right {
   float: right;
+}
+
+.align-right {
+  text-align: right;
 }
 
 .detail_header {
@@ -17,4 +22,12 @@ body {
 
 .detail_value {
   background-color: #ff9;
+}
+
+.bold {
+  font-weight: 900;
+}
+
+.no-underline {
+  text-decoration: none;
 }

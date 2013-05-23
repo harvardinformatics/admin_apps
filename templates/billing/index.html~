@@ -25,6 +25,68 @@ Home Page.
         "bAutoWidth": false
     } );
 
+    $('.expense_code').hover(
+      function() {
+        $(this).toggleClass('no-underline');
+        $(this).next('.root').toggleClass('no-underline');
+      },
+      function() {
+        $(this).toggleClass('no-underline');
+        $(this).next('.root').toggleClass('no-underline');
+      }
+    );
+
+    $('.root').hover(
+      function() {
+        $(this).toggleClass('no-underline');
+      },
+      function() {
+        $(this).toggleClass('no-underline');
+      }
+    );
+
+    function getUrlVars()
+    {
+      var vars = [], hash;
+      var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+      for(var i = 0; i < hashes.length; i++)
+      {
+	alert(hashes[i]);
+	//hash = hashes[i].split('=');
+        //vars.push(hash[0]);
+        //vars[hash[0]] = hash[1];
+      }
+      return vars;
+    }
+
+    $('.filter').click(
+      function(event) {
+        event.preventDefault();
+	/* 
+	Check if the new filter is in the existing filter.  
+	If it is, remove the existing version and append the new filter.
+        Then splice the whole thing back together.
+        */
+	var new_filter = $(this).attr('href');
+	var new_filter_key = new_filter.split("=")[0];
+	var new_filter_value = new_filter.split("=")[1];
+	var hashes = [];
+	if (window.location.href.indexOf('?') != -1) {
+	  hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+        }
+	for (var i = 0; i < hashes.length; i++) {
+	  var hash = hashes[i].split("=");
+	  //special case: remove full expense code if ec_root is checked
+	  if ((new_filter_key == "ec_root") && (hash[0] == "expense_code") || (hash[0] == new_filter_key)) {
+	    hashes.splice(i, 1);
+	  }
+	}
+	hashes.push(new_filter);
+	var new_querystring = "?" + hashes.join("&");
+	location.replace(new_querystring);
+      }
+    );
+
     var last_slash = document.URL.lastIndexOf("/");
     var first_part = document.URL.substring(0, last_slash);
     var last_part = document.URL.substring(last_slash, document.URL.length);
@@ -35,47 +97,72 @@ Home Page.
 {% endblock %}
 
 {% block content %}
-   <h1>Bill Listing</h1>
-
-   <div class="float-right" style="margin-bottom: 1em;">
-   <a href="?month=1">Jan</a> |
-   <a href="?month=2">Feb</a> |
-   <a href="?month=3">Mar</a> |
-   <a href="?month=4">Apr</a> |
-   <a href="?month=5">May</a> |
-   <a href="?month=6">Jun</a> |
-   <a href="?month=7">Jul</a> |
-   <a href="?month=8">Aug</a> |
-   <a href="?month=9">Sep</a> |
-   <a href="?month=10">Oct</a> |
-   <a href="?month=11">Nov</a> |
-   <a href="?month=12">Dec</a> |
-   <a href="?">All</a>
+   <div class="align-right" style="margin-bottom: 1em;">
+   <a href="month=1" class="filter">Jan</a> |
+   <a href="month=2" class="filter">Feb</a> |
+   <a href="month=3" class="filter">Mar</a> |
+   <a href="month=4" class="filter">Apr</a> |
+   <a href="month=5" class="filter">May</a> |
+   <a href="month=6" class="filter">Jun</a> |
+   <a href="month=7" class="filter">Jul</a> |
+   <a href="month=8" class="filter">Aug</a> |
+   <a href="month=9" class="filter">Sep</a> |
+   <a href="month=10" class="filter">Oct</a> |
+   <a href="month=11" class="filter">Nov</a> |
+   <a href="month=12" class="filter">Dec</a> |
+   <a href="/billing/">All</a>
    </div>
+
+   <div id="bill_content">
+   <h1>Bill Listing{% if display_filters %} - 
+       {% if display_filters.month %}
+         {{ display_filters.month|date:"N" }},
+       {% endif %}
+       {% if display_filters.year %}
+         {{ display_filters.year }}
+       {% endif %}
+       {% if display_filters.expense_code %}
+         <br />Exp. Code: {{ display_filters.expense_code }}
+       {% endif %}
+       {% if display_filters.ec_root %}
+         <br />Exp. Code Root: {{ display_filters.ec_root }}
+       {% endif %}
+       
+     {% endif %}
+   </h1>
 
    <table id="billing_record_list">
      <thead>
      <tr class="header_row">
-       <th style="width: 20%;">Name</th>
-       <th>Payment Code</th>
+       <th style="width: 15%;">Name</th>
+       <th style="width: 20%;">Payment Code</th>
        <th>Amount</th>
        <th>Date</th>
+       <th style="width: 30%;">Description</th>
      </tr>
      </thead>
 
      <tbody>
      {% for br in brs %}
      <tr class="br_row">
-       <td>{{ br.name }}</td>
-       <td>{{ br.payment_code }}<br /><a href="?ec_root={{ br.payment_code|slice:'34:' }}">This Root Only</a> | 
-	 <a href="?expense_code={{ br.payment_code }}">This Code Only</a></td>
+       <td><a href="/billing/{{ br.id }}/">{{ br.name }}</a></td>
+       <td><span style="white-space: nowrap;"><a href="expense_code={{ br.payment_code }}" class="expense_code no-underline filter" style="white-space: nowrap;">{{ br.payment_code|slice:':34' }}</a><a href="ec_root={{ br.payment_code|slice:'34:' }}" class="root no-underline filter">{{ br.payment_code|slice:'34:' }}</a></span>
+       </td>
        <td>${{ br.amount }}</td>
        <td>{{ br.bill_date|date }}</td>
+       <td>{{ br.notes }}</td>
      </tr>
      {% endfor %}
      </tbody>
    </table>
 
-   <a href="" id="pdf_link" class="float-right">PDF Version</a>
+   <div class="align-right">
+     <span id="total" class="bold">Total: ${{ total }}</span>
+   </div>
+   </div> <!-- end bill_content -->
+
+   <div class="align-right">
+     <a href="" id="pdf_link">PDF Version</a>
+   </div>
 
 {% endblock %}
