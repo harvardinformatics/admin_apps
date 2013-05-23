@@ -19,7 +19,7 @@ Home Page.
     $('#billing_record_list').dataTable( {
         "bPaginate": false,
         "bLengthChange": false,
-        "bFilter": true,
+        "bFilter": false,
         "bSort": false,
         "bInfo": false,
         "bAutoWidth": false
