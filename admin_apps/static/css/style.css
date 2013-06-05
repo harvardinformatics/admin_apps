@@ -31,3 +31,12 @@ body {
 .no-underline {
   text-decoration: none;
 }
+
+.login_content {
+  margin: 20% 40%;
+  text-align: center;
+}
+
+h1 {
+   color: #333;
+}

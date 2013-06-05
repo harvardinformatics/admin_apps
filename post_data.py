@@ -33,7 +33,7 @@ else:
 request = urllib2.Request(url)                        #create the request object
 json_data = json.dumps(data)                          #json-fy the data
 if len(sys.argv) == 5:
-    json_data = data
+    json_data = dat
 request.add_data(json_data) 
 
 request.add_header('Content-Type', 'application/json')

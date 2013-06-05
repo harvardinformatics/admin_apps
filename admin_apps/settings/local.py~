@@ -19,6 +19,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(VAR_ROOT, 'dev.db'),
+    },
+    'alt': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(VAR_ROOT, 'alt.db'),
     }
 }
 
@@ -33,6 +37,8 @@ STATICFILES_DIRS = (
 TEMPLATE_DIRS = (
     os.path.join(VAR_ROOT, 'templates'),
 )
+
+FOO = "BAR"
 
 EXTERNAL_SOURCES = {
     #'helium': 'http://127.0.0.1:8000/static/js/example_data.js'

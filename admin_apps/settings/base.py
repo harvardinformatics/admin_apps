@@ -79,7 +79,7 @@ ROOT_URLCONF = 'urls'
 
 LOGIN_URL = '/login/'
 LOGOUT_URL = '/logout/'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/billing/'
 
 STATIC_URL = '/static/'
 MEDIA_URL = '/uploads/'
@@ -118,6 +118,7 @@ MIDDLEWARE_CLASSES += (
 #==============================================================================
 
 AUTHENTICATION_BACKENDS += (
+    'ad_auth.auth.ActiveDirectoryBackend',
 )
 
 #==============================================================================
