@@ -97,6 +97,8 @@ Home Page.
 {% endblock %}
 
 {% block content %}
+   <div><a href="/logout/">Logout</a></div>
+
    <div class="align-right" style="margin-bottom: 1em;">
    <a href="month=1" class="filter">Jan</a> |
    <a href="month=2" class="filter">Feb</a> |
@@ -160,9 +162,11 @@ Home Page.
      <span id="total" class="bold">Total: ${{ total }}</span>
    </div>
    </div> <!-- end bill_content -->
+   <br />
 
    <div class="align-right">
-     <a href="" id="pdf_link">PDF Version</a>
+     <a href="" id="new_pdf_link">New PDF Version</a>
+     <a href="" id="pdf_link">OLD PDF Version</a>
    </div>
 
 {% endblock %}

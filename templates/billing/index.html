@@ -92,11 +92,15 @@ Home Page.
     var last_part = document.URL.substring(last_slash, document.URL.length);
     var new_url = first_part + "/pdf" + last_part;
     $('#pdf_link').attr("href", new_url)
+    var new_url = first_part + "/create_doc" + last_part;
+    $('#new_pdf_link').attr("href", new_url)
   } );
 </script>
 {% endblock %}
 
 {% block content %}
+   <div><a href="/logout/">Logout</a></div>
+
    <div class="align-right" style="margin-bottom: 1em;">
    <a href="month=1" class="filter">Jan</a> |
    <a href="month=2" class="filter">Feb</a> |
@@ -146,7 +150,7 @@ Home Page.
      {% for br in brs %}
      <tr class="br_row">
        <td><a href="/billing/{{ br.id }}/">{{ br.name }}</a></td>
-       <td><span style="white-space: nowrap;"><a href="expense_code={{ br.payment_code }}" class="expense_code no-underline filter" style="white-space: nowrap;">{{ br.payment_code|slice:':34' }}</a><a href="ec_root={{ br.payment_code|slice:'34:' }}" class="root no-underline filter">{{ br.payment_code|slice:'34:' }}</a></span>
+       <td><span style="white-space: nowrap;"><a href="expense_code={{ br.payment_code }}" class="expense_code no-underline filter" style="white-space: nowrap;">{{ br.payment_code|slice:':-5' }}</a><a href="ec_root={{ br.payment_code|slice:'-5:' }}" class="root no-underline filter">{{ br.payment_code|slice:'-5:' }}</a></span>
        </td>
        <td>${{ br.amount }}</td>
        <td>{{ br.bill_date|date }}</td>
@@ -163,7 +167,8 @@ Home Page.
    <br />
 
    <div class="align-right">
-     <a href="" id="pdf_link">PDF Version</a>
+     <a href="" id="new_pdf_link">New PDF Version</a>
+     <a href="" id="pdf_link">OLD PDF Version</a>
    </div>
 
 {% endblock %}
