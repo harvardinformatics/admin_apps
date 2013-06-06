@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% comment %}
+Login Page
+{% endcomment %}
+
+{% block title %}
+  Login to Billing
+{% endblock %}
+
+{% block head %}
+<style type="text/css" title="currentStyle">
+  @import "/static/js/datatables/media/css/demo_page.css";
+</style>
+<script type="text/javascript" language="javascript" src="/static/js/datatables/media/js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function() {
+
+  } );
+</script>
+{% endblock %}
+
+{% block content %}
+
+{% if form.errors %}
+<p>Your username and password didn't match. Please try again.</p>
+{% endif %}
+
+<div class="login_content">
+<h1>Billing Login</h1>
+<form method="post" action=".">
+{% csrf_token %}
+<table>
+<tr>
+    <td>{{ form.username.label_tag }}</td>
+    <td>{{ form.username }}</td>
+</tr>
+<tr>
+    <td>{{ form.password.label_tag }}</td>
+    <td>{{ form.password }}</td>
+</tr>
+</table>
+
+<input type="submit" value="login" />
+<input type="hidden" name="next" value="{{ next }}" />
+</form>
+</div>
+
+{% endblock %}
