@@ -63,6 +63,7 @@ def get_br_context(request, filters=None):
     return Context({ 'brs': brs, 'total': total, 'display_filters': display_filters, })
 
 @login_required
+@csrf_exempt
 def index(request):
     filters = check_querystring(request)
     dd = get_br_context(request, filters)
@@ -122,7 +123,7 @@ def get_user_info(username, password):
 
 @csrf_exempt
 def create_doc(request):
-    source_url = "http://%s/%s/%s" % (request.get_host(), "billing", request.META['QUERY_STRING'])
+    source_url = "http://%s/%s/?%s" % (request.get_host(), "billing", request.META['QUERY_STRING'])
 
     username = 'helium' #move this later
     password = 'h3l1um' #move and change this later
@@ -164,8 +165,8 @@ def create_doc(request):
     base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
     request.add_header("Authorization", "Basic %s" % base64string)
     request.add_data(json_data)
-    response = urllib2.urlopen(request)                       #open the url request object and capture the response
-    #return tastypie document uri
+    response = urllib2.urlopen(request)
+
     try:
         location = re.search( r'Location: (.+)$', response.headers.__str__(), re.M)
     except:
@@ -176,6 +177,7 @@ def create_doc(request):
     except:
         return HttpResponse('No ID!')
     uri_id = uri_id.group(1)
+    log.debug("doc_id: %s" % document_id)
 
     #get pdf
     destination_url = 'http://dokken.rc.fas.harvard.edu/harvard_docs/pdf/%s/' % uri_id

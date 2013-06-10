@@ -3,7 +3,7 @@ import httplib2
 from datetime import datetime
 from django.utils.timezone import utc
 
-sys.path.append('/Users/ericmattison/code/admin_apps/')
+sys.path.append('/var/www/admin_apps/')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'admin_apps.settings.local'
 
 from admin_apps.settings import local as settings

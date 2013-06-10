@@ -12,15 +12,15 @@ from django.contrib.auth.forms import AuthenticationForm
 
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.contrib.sites.models import get_current_site
 
 #from ad_auth.auth import ActiveDirectoryBackend
 #from ad_auth.auth.ActiveDirectoryBackend import authenticate
 
 @sensitive_post_parameters()
-@csrf_protect
-@never_cache
+@csrf_exempt
+#@never_cache
 def login_view(request, template_name='registration/login.html',
           redirect_field_name=REDIRECT_FIELD_NAME,
           authentication_form=AuthenticationForm,

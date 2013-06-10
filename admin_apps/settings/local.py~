@@ -1,28 +1,23 @@
-"""
-Example settings for local development
-
-Use this file as a base for your local development settings and copy
-it to admin_apps/settings/local.py. It should not be checked into
-your code repository.
-
-"""
+"""Settings for Production Server"""
 from admin_apps.settings.base import *   # pylint: disable=W0614,W0401
 
-ADMINS = (
-    ('Eric', 'mattison@g.harvard.edu'),
-)
-MANAGERS = ADMINS
+DEBUG = True
+TEMPLATE_DEBUG = DEBUG
 
-VAR_ROOT = '/Users/ericmattison/code/admin_apps'
+PW_FILE = '/var/www/pw'
+f = open(PW_FILE)
+un, pw = f.read().strip().split(':')
+
+VAR_ROOT = '/var/www/admin_apps'
+MEDIA_ROOT = os.path.join(VAR_ROOT, 'uploads')
+STATIC_ROOT = os.path.join(VAR_ROOT, 'static')
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(VAR_ROOT, 'dev.db'),
-    },
-    'alt': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(VAR_ROOT, 'alt.db'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'admin_apps',
+        'USER': un,
+        'PASSWORD': pw,
     }
 }
 
@@ -38,18 +33,9 @@ TEMPLATE_DIRS = (
     os.path.join(VAR_ROOT, 'templates'),
 )
 
-FOO = "BAR"
-
 EXTERNAL_SOURCES = {
-    #'helium': 'http://127.0.0.1:8000/static/js/example_data.js'
+    #'helium': 'http://127.0.0.1:8000/static/js/example_data.js'                                                                               
     'helium': 'http://helium.rc.fas.harvard.edu/minilims/plugins/Helium/scripts/generate_billing_records.php'
 }
 
-#TEMPLATE_LOADERS = (
-  #'django.template.loaders.filesystem.Loader',
-  #'django.template.loaders.app_directories.Loader',
-#)
-
-
-#ROOT_URLCONF = 'admin_apps.urls.local'
-#WSGI_APPLICATION = 'admin_apps.wsgi.local.application'
+# WSGI_APPLICATION = 'admin_apps.wsgi.dev.application'
