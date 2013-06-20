@@ -6,9 +6,11 @@ from django.db.models import Sum
 from django.template import RequestContext, loader, Context
 from billing_record.models import *
 from datetime import datetime, date, timedelta
+from time import sleep
 from django.utils.timezone import utc
 from django_xhtml2pdf import utils
 from django.views.decorators.csrf import csrf_exempt
+from django.template.defaultfilters import slugify
 
 import logging
 log = logging.getLogger(__name__)
@@ -20,6 +22,7 @@ import sys
 import urllib, urllib2
 import json
 import base64
+import cStringIO
 
 def get_br_context(request, filters=None):
     #get all bills
@@ -123,7 +126,7 @@ def get_user_info(username, password):
 
 @csrf_exempt
 def create_doc(request):
-    source_url = "http://%s/%s/?%s" % (request.get_host(), "billing", request.META['QUERY_STRING'])
+    source_url = "http://%s/%s/?%s%s" % (request.get_host(), "billing", 'format=json&', request.META['QUERY_STRING'])
 
     username = 'helium' #move this later
     password = 'h3l1um' #move and change this later
@@ -158,6 +161,7 @@ def create_doc(request):
         }
     json_data = json.dumps(data)                          #json-fy the data
 
+    #create the django object
     destination_url = 'http://dokken.rc.fas.harvard.edu/a/api/document/'
     request = urllib2.Request(destination_url)
     request.add_header('Content-Type', 'application/json')
@@ -177,16 +181,24 @@ def create_doc(request):
     except:
         return HttpResponse('No ID!')
     uri_id = uri_id.group(1)
-    log.debug("doc_id: %s" % document_id)
 
-    #get pdf
-    destination_url = 'http://dokken.rc.fas.harvard.edu/harvard_docs/pdf/%s/' % uri_id
+    #create the pdf
+    destination_url = 'http://dokken.rc.fas.harvard.edu/harvard_doc/pdf/%s/' % uri_id
     request = urllib2.Request(destination_url)
     request.add_header('Content-Type', 'application/json')
     request.add_header('Accept', 'application/json, text/html')
     base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
     request.add_header("Authorization", "Basic %s" % base64string)
-    response = urllib2.urlopen(request)                       #open the url request object and capture the response
+    response = urllib2.urlopen(request)                       #this request creates the pdf on dokken
+
+    #get the pdf from dokken
+    destination_url = 'http://dokken.rc.fas.harvard.edu/uploads/%s.pdf' % slugify(name)
+    pdf = urllib2.urlopen(destination_url)
+    output = cStringIO.StringIO()
+    output.write(pdf.read())
+    response = HttpResponse(output.getvalue(), content_type="application/pdf")
+    output.close()
+    response['Content-Disposition'] = 'attachment; filename=%s.pdf' % slugify(name)
     return response
 
 @csrf_exempt
