@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.db.models import Sum
 from django.template import RequestContext, loader, Context
 from billing_record.models import *
+from billing_record.get_records import get_records
 from datetime import datetime, date, timedelta
 from time import sleep
 from django.utils.timezone import utc
@@ -201,6 +202,7 @@ def create_doc(request):
     response['Content-Disposition'] = 'attachment; filename=%s.pdf' % slugify(name)
     return response
 
+""" No longer used
 @csrf_exempt
 def generate_doc(request, file_format='html'):
     if not file_format in ('html', 'pdf'):
@@ -226,3 +228,4 @@ def generate_doc(request, file_format='html'):
     print output
     return render_to_response('billing/index.html', data, context_instance=RequestContext(request))
 
+"""
