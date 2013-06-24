@@ -10,7 +10,8 @@ from admin_apps.settings import local as settings
 from billing_record.models import BillingRecord
 from django.contrib.auth.models import User
 
-if __name__ == '__main__':
+def get_records():
+    brs_added = []
     for k,v in settings.EXTERNAL_SOURCES.iteritems():
         h = httplib2.Http()
         resp, content = h.request(v, "GET")
@@ -35,4 +36,11 @@ if __name__ == '__main__':
                                    user=user,
                                    external_unique_id=external_unique_id)
                 br.save()
-                print "Entered %s" % br
+                brs_added.append(br)
+    return brs_added
+
+if __name__ == '__main__':
+    brs = get_records()
+    print "Billing Records added: "
+    for br in brs:
+        print "\t%s, %s, %s, %s" % (br.name, br.payment_code, br.bill_date, br.user)
