@@ -1,4 +1,4 @@
-import settings
+from admin_apps.settings import local as settings
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpRequest
 from django.contrib.auth.decorators import login_required
@@ -114,7 +114,7 @@ def check_querystring(request):
 
 def get_user_info(username, password):
     #get the user from dokken using tastypie
-    user_url = 'http://dokken.rc.fas.harvard.edu/a/api/user/?format=json&username=%s' % username
+    user_url = 'http://%s/a/api/user/?format=json&username=%s' % (settings.DOCUMENT_APP_HOST, username)
     request = urllib2.Request(user_url)
     request.add_header('Content-Type', 'application/json')
     request.add_header('Accept', 'application/json, text/html')
@@ -128,16 +128,23 @@ def get_user_info(username, password):
 
 @csrf_exempt
 def create_doc(request):
+    for i in dir(request):
+        print i
+    print request.COOKIES
+    """
+    Using the current url, assemble the data to be sent to the document app
+    Send the data - the document app will send back a pdf and save copy of the invoice as a html (or just in the database)
+    """
+    #get the url for the current page, including the querystring
     source_url = "http://%s/%s/?%s%s" % (request.get_host(), "billing", 'format=json&', request.META['QUERY_STRING'])
 
+    #get the user object from dokken using username and password
     username = 'helium' #move this later
     password = 'h3l1um' #move and change this later
-
     try:
         user_info = get_user_info(username, password)
     except:
         return HttpResponse('No such user')
-
     user_uri = user_info[0]['resource_uri']
     name_list = []
     if 'month' in request.GET:
@@ -152,11 +159,22 @@ def create_doc(request):
         name_list.append("Exp. Code Root: %s" % request.GET['ec_root'])
     name = ', '.join([v for v in name_list])
         
+    #get the current time
     now = str(datetime.utcnow().replace(tzinfo=utc))  #format now as a string
+
+    #get the html for this page using urllib (is there a better way to do this?)
+    sessionid = request.COOKIES['sessionid']
+    opener = urllib2.build_opener()
+    opener.addheaders.append(('Cookie', 'sessionid=%s' % sessionid))
+    response = opener.open(source_url)
+    html = response.read()
+    print html
+    sys.exit()
 
     data = {
         'name':  name,
         'user': user_uri,
+        'html': html,
         'url': source_url,
         'created': now,
         'modified': now,
@@ -164,7 +182,7 @@ def create_doc(request):
     json_data = json.dumps(data)                          #json-fy the data
 
     #create the django object
-    destination_url = 'http://dokken.rc.fas.harvard.edu/a/api/document/' % settings.DOCUMENT_APP_HOST
+    destination_url = 'http://%s/a/api/document/' % settings.DOCUMENT_APP_HOST
     request = urllib2.Request(destination_url)
     request.add_header('Content-Type', 'application/json')
     request.add_header('Accept', 'application/json, text/html')
@@ -179,13 +197,13 @@ def create_doc(request):
         return HttpResponse('No URI!')
     location = location.group(1)
     try:
-        uri_id = re.search( r'http://dokken.rc.fas.harvard.edu/a/api/document/(\d+)/', location, re.M)
+        uri_id = re.search( r'http://%s/a/api/document/(\d+)/' % settings.DOCUMENT_APP_HOST, location, re.M)
     except:
         return HttpResponse('No ID!')
     uri_id = uri_id.group(1)
 
     #create the pdf
-    destination_url = 'http://dokken.rc.fas.harvard.edu/harvard_doc/pdf/%s/' % uri_id
+    destination_url = 'http://%s/harvard_doc/pdf/%s/' % (settings.DOCUMENT_APP_HOST, uri_id)
     request = urllib2.Request(destination_url)
     request.add_header('Content-Type', 'application/json')
     request.add_header('Accept', 'application/json, text/html')
@@ -194,7 +212,7 @@ def create_doc(request):
     response = urllib2.urlopen(request)                       #this request creates the pdf on dokken
 
     #get the pdf from dokken
-    destination_url = 'http://dokken.rc.fas.harvard.edu/uploads/%s.pdf' % slugify(name)
+    destination_url = 'http://%s/uploads/%s.pdf' % (settings.DOCUMENT_APP_HOST, slugify(name))
     pdf = urllib2.urlopen(destination_url)
     output = cStringIO.StringIO()
     output.write(pdf.read())
@@ -202,31 +220,3 @@ def create_doc(request):
     output.close()
     response['Content-Disposition'] = 'attachment; filename=%s.pdf' % slugify(name)
     return response
-
-""" No longer used
-@csrf_exempt
-def generate_doc(request, file_format='html'):
-    if not file_format in ('html', 'pdf'):
-        file_format = 'html'
-    url = 'http://dokken.rc.fas.harvard.edu/harvard_doc/' + file_format + '/'
-    request_url = ''.join(['http://', request.get_host(), request.get_full_path()]) 
-    data = urllib.urlencode({
-            'request_url': request_url,
-            })
-    req = urllib2.Request(url, data)
-    #req.add_data(json_data)
-    #req.add_data(data)
-    #req.add_header('Content-Type', 'application/json')
-    #req.add_header('Accept', 'application/json, text/html')
-    #username = request.user.username
-    #password = request.user.password
-    #base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
-    #req.add_header("Authorization", "Basic %s" % base64string)
-
-    #response = urllib2.urlopen(req)                       #open the url request object and capture the response
-    response = urllib.urlopen(url, data)                       #open the url request object and capture the response
-    output = response.read()                                  #read the string response
-    print output
-    return render_to_response('billing/index.html', data, context_instance=RequestContext(request))
-
-"""

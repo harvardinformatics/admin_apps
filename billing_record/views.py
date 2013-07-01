@@ -23,6 +23,7 @@ import re
 import sys
 import urllib, urllib2
 import json
+from bs4 import BeautifulSoup
 import base64
 import cStringIO
 
@@ -126,11 +127,36 @@ def get_user_info(username, password):
         return user_info['objects']
     return False
 
+def get_doc_version_by_name(doc_name, user_info, username, password):
+    """
+    Users may create various versions with the same name, "XXXX-v01, XXXX-v02, etc."
+    """
+    #get the user from dokken using tastypie
+    doc_name = urllib.quote(doc_name)
+    user_id = user_info[0]['id']
+
+    doc_url = 'http://%s/a/api/document/?format=json&name__startswith=%s&user=%s&order_by=-name&limit=1' \
+        % (settings.DOCUMENT_APP_HOST, doc_name, user_id)
+    request = urllib2.Request(doc_url)
+    request.add_header('Content-Type', 'application/json')
+    request.add_header('Accept', 'application/json, text/html')
+    base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
+    request.add_header("Authorization", "Basic %s" % base64string)
+    response = urllib2.urlopen(request)                       #open the url request object and capture the response
+    doc_info = json.loads(response.read())                   #read the string response and convert it to json object
+    if doc_info['meta']['total_count']:
+        doc_name = doc_info['objects'][0]['name']
+        matchObj = re.search( r'-v(\d+)', doc_name, re.M|re.I)
+        old_version = int(matchObj.group(1))
+        new_version = old_version + 1
+        version_string = 'v%02d' % new_version
+        return version_string    
+    #no matching objects, so default to v01
+    return "v01"
+
+
 @csrf_exempt
 def create_doc(request):
-    for i in dir(request):
-        print i
-    print request.COOKIES
     """
     Using the current url, assemble the data to be sent to the document app
     Send the data - the document app will send back a pdf and save copy of the invoice as a html (or just in the database)
@@ -146,19 +172,25 @@ def create_doc(request):
     except:
         return HttpResponse('No such user')
     user_uri = user_info[0]['resource_uri']
+    
+    #construct the name
     name_list = []
-    if 'month' in request.GET:
-        name_list.append(date(2013, int(request.GET['month']), 1).strftime("%b"))
     if 'year' in request.GET:
         name_list.append(date(request.GET['year'], 1, 1).strftime("%Y"))
     else:
         name_list.append(date.today().strftime("%Y"))
+    if 'month' in request.GET:
+        name_list.append(date(2013, int(request.GET['month']), 1).strftime("%m"))
     if 'expense_code' in request.GET:
-        name_list.append("Exp. Code: %s" % request.GET['expense_code'])
+        name_list.append("%s" % request.GET['expense_code'])
     if 'ec_root' in request.GET:
-        name_list.append("Exp. Code Root: %s" % request.GET['ec_root'])
-    name = ', '.join([v for v in name_list])
-        
+        name_list.append("%s" % request.GET['ec_root'])
+    name = '-'.join([v for v in name_list])
+
+    #get the last version number from the document with this name
+    doc_version = get_doc_version_by_name(name, user_info, username, password)
+    name = '-'.join([name, doc_version])
+
     #get the current time
     now = str(datetime.utcnow().replace(tzinfo=utc))  #format now as a string
 
@@ -167,9 +199,9 @@ def create_doc(request):
     opener = urllib2.build_opener()
     opener.addheaders.append(('Cookie', 'sessionid=%s' % sessionid))
     response = opener.open(source_url)
-    html = response.read()
-    print html
-    sys.exit()
+    content = response.read()
+    soup = BeautifulSoup(content)
+    html = str(soup.find(id="billing_record_list"))
 
     data = {
         'name':  name,
@@ -191,6 +223,7 @@ def create_doc(request):
     request.add_data(json_data)
     response = urllib2.urlopen(request)
 
+    #get the uri id for the object that was created
     try:
         location = re.search( r'Location: (.+)$', response.headers.__str__(), re.M)
     except:
@@ -202,7 +235,7 @@ def create_doc(request):
         return HttpResponse('No ID!')
     uri_id = uri_id.group(1)
 
-    #create the pdf
+    #create the pdf using the uri id
     destination_url = 'http://%s/harvard_doc/pdf/%s/' % (settings.DOCUMENT_APP_HOST, uri_id)
     request = urllib2.Request(destination_url)
     request.add_header('Content-Type', 'application/json')
