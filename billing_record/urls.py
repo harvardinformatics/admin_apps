@@ -9,7 +9,7 @@ urlpatterns = patterns('billing_record.views',
 
    (r'^create_doc/$', 'create_doc'),
 
-   (r'^generate_doc/$', 'generate_doc'),
-   (r'^generate_doc/(?P<file_format>\w+)/$', 'generate_doc'),
+   #(r'^generate_doc/$', 'generate_doc'),
+   #(r'^generate_doc/(?P<file_format>\w+)/$', 'generate_doc'),
 
 )

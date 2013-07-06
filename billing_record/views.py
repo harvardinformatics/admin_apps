@@ -7,6 +7,7 @@ from django.db.models import Sum
 from django.template import RequestContext, loader, Context
 from billing_record.models import *
 from billing_record.get_records import get_records
+from invoice.models import Invoice
 from datetime import datetime, date, timedelta
 from time import sleep
 from django.utils.timezone import utc
@@ -179,12 +180,17 @@ def create_doc(request):
         name_list.append(date(request.GET['year'], 1, 1).strftime("%Y"))
     else:
         name_list.append(date.today().strftime("%Y"))
+    month = None
     if 'month' in request.GET:
-        name_list.append(date(2013, int(request.GET['month']), 1).strftime("%m"))
+        month = int(request.GET['month'])
+        bill_month = date(2013, month, 1)
+        name_list.append(bill_month.strftime("%m"))
     if 'expense_code' in request.GET:
         name_list.append("%s" % request.GET['expense_code'])
+    ec_root = None
     if 'ec_root' in request.GET:
-        name_list.append("%s" % request.GET['ec_root'])
+        ec_root = request.GET['ec_root']
+        name_list.append("%s" % ec_root)
     name = '-'.join([v for v in name_list])
 
     #get the last version number from the document with this name
@@ -213,7 +219,19 @@ def create_doc(request):
         }
     json_data = json.dumps(data)                          #json-fy the data
 
-    #create the django object
+    #create the invoice
+    user = User.objects.get(username=username)
+    inv = Invoice()
+    inv.invoice_number = name
+    inv.bill_month = bill_month
+    inv.expense_code_root = ec_root
+    inv.html_content = html
+    inv.user = user
+    inv.created = now
+    inv.modified = now
+    inv.save()
+
+    #create the django object in the document app
     destination_url = 'http://%s/a/api/document/' % settings.DOCUMENT_APP_HOST
     request = urllib2.Request(destination_url)
     request.add_header('Content-Type', 'application/json')

@@ -2,7 +2,7 @@
 # Import global settings to make it easier to extend settings.
 from django.conf.global_settings import *   # pylint: disable=W0614,W0401
 import south
-import billing_record
+import billing_record, invoice
 
 #==============================================================================
 # Generic Django project settings
@@ -28,9 +28,9 @@ SECRET_KEY = '01(u7h$m$pzvdta9(#-@z@wzs5((98-!4tpwmx-r$c89qtn4gj'
 
 INSTALLED_APPS = (
     # 'admin_apps.apps.',
-
     'tastypie',
     'south',
+    'invoice',
     'billing_record',
     'django.contrib.auth',
     'django.contrib.contenttypes',

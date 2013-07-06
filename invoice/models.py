@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import datetime, date
 from django.utils.timezone import utc
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Invoice(models.Model):
@@ -8,6 +9,7 @@ class Invoice(models.Model):
     bill_month = models.DateField(null=True, blank=True)
     expense_code_root = models.CharField(max_length=5, null=True, blank=True)
     html_content = models.TextField(default="", null=True, blank=True)
+    user = models.ForeignKey(User)
     created = models.DateTimeField(null=False, default=datetime.utcnow().replace(tzinfo=utc))
     modified = models.DateTimeField(null=False, default=datetime.utcnow().replace(tzinfo=utc))
 
@@ -21,11 +23,10 @@ class Invoice(models.Model):
         super(Invoice, self).save(*args, **kwargs)
 
     def get_bill_month(self):
-        """
-        look in html content for billing month
-        """
-        #default to this month
-        bill_month = date(date.today().year, date.today().month, 1)
+        try:
+            bill_month = self.bill_month
+        except:
+            bill_month = date(date.today().year, date.today().month, 1)
         return bill_month
 
     def get_expense_code_root(self):
