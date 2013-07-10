@@ -10,6 +10,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'admin_apps.settings.local'
 from admin_apps.settings import local as settings
 from billing_record.models import BillingRecord, CreditSummary
 from django.contrib.auth.models import User
+from decimal import Decimal
 
 def get_records(month_string=None):
     all_additions = {}
@@ -89,7 +90,7 @@ def get_records(month_string=None):
                     if finalized:
                         name = item['Group']
                         payment_code = ": ".join(item['Expense_Code'].split('_:_'))
-                        amount = float(item['Dewar_Cost'])
+                        amount = Decimal(item['Dewar_Cost'])
                         bill_date = datetime.strptime(item['Month'] + "-1", '%Y-%m-%d').replace(tzinfo=utc)
                         notes = item['Description'].replace("_", " ").replace("\\", "")\
                             .replace(" %", "%").replace("dollars credit", "dollar credit")

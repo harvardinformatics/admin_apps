@@ -220,6 +220,8 @@ def create_doc(request):
     #get the url for the current page, including the querystring
     source_url = "http://%s/%s/?%s%s" % (request.get_host(), "billing", 'format=json&', request.META['QUERY_STRING'])
 
+    #log.debug("source_url: %s" % source_url)
+
     #get the user object from dokken using username and password
     username = 'helium' #move this later
     password = 'h3l1um' #move and change this later
@@ -232,13 +234,15 @@ def create_doc(request):
     #construct the name
     name_list = []
     if 'year' in request.GET:
-        name_list.append(date(request.GET['year'], 1, 1).strftime("%Y"))
+        year = int(request.GET['year'])
+        name_list.append(date(year, 1, 1).strftime("%Y"))
     else:
         name_list.append(date.today().strftime("%Y"))
     month = None
+    bill_month = date(date.today().year, date.today().month, 1)
     if 'month' in request.GET:
         month = int(request.GET['month'])
-        bill_month = date(2013, month, 1)
+        bill_month = date(date.today().year, month, 1)
         name_list.append(bill_month.strftime("%m"))
     if 'expense_code' in request.GET:
         name_list.append("%s" % request.GET['expense_code'])
@@ -262,7 +266,7 @@ def create_doc(request):
     response = opener.open(source_url)
     content = response.read()
     soup = BeautifulSoup(content)
-    html = str(soup.find(id="billing_record_list"))
+    html = str(soup.find(id="billing_content"))
 
     data = {
         'name':  name,
