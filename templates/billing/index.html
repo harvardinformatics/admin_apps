@@ -87,25 +87,29 @@ Home Page.
 	If the filter selected is year then remove the month filter
         */
 	var new_filter = $(this).attr('href');
-	var new_filter_key = new_filter.split("=")[0];
-	var new_filter_value = new_filter.split("=")[1];
-	var hashes = [];
-	if (window.location.href.indexOf('?') != -1) {
-	  hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-        }
-	for (var i = 0; i < hashes.length; i++) {
-	  var hash = hashes[i].split("=");
-	  //special case: remove full expense code if ec_root is checked
-	  if ((new_filter_key == "ec_root") && (hash[0] == "expense_code") || (hash[0] == new_filter_key)) {
-	    hashes.splice(i, 1);
+	var new_querystring = "?"
+	if (new_filter != "nofilters") {
+	  var new_filter_key = new_filter.split("=")[0];
+	  var new_filter_value = new_filter.split("=")[1];
+	  var hashes = [];
+	  if (window.location.href.indexOf('?') != -1) {
+	    hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+          }
+	  for (var i = 0; i < hashes.length; i++) {
+	    var hash = hashes[i].split("=");
+	    //special case: remove full expense code if ec_root is checked
+	    if ((new_filter_key == "ec_root") && (hash[0] == "expense_code") || (hash[0] == new_filter_key)) {
+	      hashes.splice(i, 1);
+	    }
+	    //special case: remove month if year is checked
+	    //fix this...
+	    if ((new_filter_key == "year") && (hash[0] == "month") || (hash[0] == "ec_root") || (hash[0] == new_filter_key)) {
+	      hashes.splice(i, 1);
+	    }
 	  }
-	  //special case: remove full expense code if ec_root is checked
-	  if ((new_filter_key == "year") && (hash[0] == "month") || (hash[0] == new_filter_key)) {
-	    hashes.splice(i, 1);
-	  }
+	  hashes.push(new_filter);
+	  new_querystring += hashes.join("&");
 	}
-	hashes.push(new_filter);
-	var new_querystring = "?" + hashes.join("&");
 	location.replace(new_querystring);
       }
     );
@@ -139,7 +143,8 @@ Home Page.
    <a href="month=12" class="filter">Dec</a> |
    <!-- <a href="/billing/">Current Year</a> | -->
    <a href="year=2013" class="filter">2013</a> |
-   <a href="year=2014" class="filter">2014</a>
+   <a href="year=2014" class="filter">2014</a> |
+   <a href="nofilters" class="filter">All</a>
    </div>
 
    <div id="bill_content">

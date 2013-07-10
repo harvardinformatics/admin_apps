@@ -266,7 +266,7 @@ def create_doc(request):
     response = opener.open(source_url)
     content = response.read()
     soup = BeautifulSoup(content)
-    html = str(soup.find(id="billing_content"))
+    html = str(soup.find(id="bill_content"))
 
     data = {
         'name':  name,
