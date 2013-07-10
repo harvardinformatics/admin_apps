@@ -25,6 +25,24 @@ Home Page.
         "bAutoWidth": false
     } );
 
+    $('#credit_summaries').dataTable( {
+        "bPaginate": false,
+        "bLengthChange": false,
+        "bFilter": false,
+        "bSort": false,
+        "bInfo": false,
+        "bAutoWidth": false
+    } );
+
+    $('#ec_summary').dataTable( {
+        "bPaginate": false,
+        "bLengthChange": false,
+        "bFilter": false,
+        "bSort": false,
+        "bInfo": false,
+        "bAutoWidth": false
+    } );
+
     $('.expense_code').hover(
       function() {
         $(this).toggleClass('no-underline');
@@ -66,6 +84,7 @@ Home Page.
 	Check if the new filter is in the existing filter.  
 	If it is, remove the existing version and append the new filter.
         Then splice the whole thing back together.
+	If the filter selected is year then remove the month filter
         */
 	var new_filter = $(this).attr('href');
 	var new_filter_key = new_filter.split("=")[0];
@@ -78,6 +97,10 @@ Home Page.
 	  var hash = hashes[i].split("=");
 	  //special case: remove full expense code if ec_root is checked
 	  if ((new_filter_key == "ec_root") && (hash[0] == "expense_code") || (hash[0] == new_filter_key)) {
+	    hashes.splice(i, 1);
+	  }
+	  //special case: remove full expense code if ec_root is checked
+	  if ((new_filter_key == "year") && (hash[0] == "month") || (hash[0] == new_filter_key)) {
 	    hashes.splice(i, 1);
 	  }
 	}
@@ -114,7 +137,9 @@ Home Page.
    <a href="month=10" class="filter">Oct</a> |
    <a href="month=11" class="filter">Nov</a> |
    <a href="month=12" class="filter">Dec</a> |
-   <a href="/billing/">All</a>
+   <!-- <a href="/billing/">Current Year</a> | -->
+   <a href="year=2013" class="filter">2013</a> |
+   <a href="year=2014" class="filter">2014</a>
    </div>
 
    <div id="bill_content">
@@ -135,34 +160,102 @@ Home Page.
      {% endif %}
    </h1>
 
+   <h2>Helium Purchases</h2>
+
    <table id="billing_record_list">
      <thead>
      <tr class="header_row">
        <th style="width: 15%;">Name</th>
        <th style="width: 20%;">Payment Code</th>
-       <th>Amount</th>
-       <th>Date</th>
-       <th style="width: 30%;">Description</th>
+       <th style="width: 50%;">Description</th>
+       <th>Amount Charged</th>
      </tr>
      </thead>
 
      <tbody>
      {% for br in brs %}
      <tr class="br_row">
-       <td><a href="/billing/{{ br.id }}/">{{ br.name }}</a></td>
-       <td><span style="white-space: nowrap;"><a href="expense_code={{ br.payment_code }}" class="expense_code no-underline filter" style="white-space: nowrap;">{{ br.payment_code|slice:':-5' }}</a><a href="ec_root={{ br.payment_code|slice:'-5:' }}" class="root no-underline filter">{{ br.payment_code|slice:'-5:' }}</a></span>
+       <td>
+	 <!-- <a href="/billing/{{ br.id }}/">{{ br.name }}</a> -->
+	 <a href="ec_root={{ br.payment_code|slice:'-5:' }}" class="root filter">{{ br.name }}</a>
        </td>
-       <td>${{ br.amount }}</td>
-       <td>{{ br.bill_date|date }}</td>
+       <td><!-- <span style="white-space: nowrap;"><a href="expense_code={{ br.payment_code }}" class="expense_code no-underline filter" style="white-space: nowrap;">{{ br.payment_code|slice:':-5' }}</a><a href="ec_root={{ br.payment_code|slice:'-5:' }}" class="root no-underline filter">{{ br.payment_code|slice:'-5:' }}</a></span> -->
+	 <span style="white-space: nowrap;">{{ br.payment_code|slice:':-5' }}<a href="ec_root={{ br.payment_code|slice:'-5:' }}" class="root filter">{{ br.payment_code|slice:'-5:' }}</a></span>
+       </td>
        <td>{{ br.notes }}</td>
+       <td style="text-align: right">${{ br.amount }}</td>
      </tr>
      {% endfor %}
      </tbody>
    </table>
 
    <div class="align-right">
-     <span id="total" class="bold">Total: ${{ total }}</span>
+     <span id="total_purchases" class="bold">Total Purchases: ${{ brs_total }}</span>
    </div>
+
+   {% if credits %}
+   <h2>Helium Recovery Credits</h2>
+   <table id="credit_summaries">
+     <thead>
+     <tr class="header_row">
+       <th>Group</th>
+       <th>Total Cost of Dewars</th>
+       <th>Total Volume Recovered</th>
+       <th>Amount Credited</th>
+     </tr>
+     </thead>
+
+     <tbody>
+     {% for credit in credits %}
+     <tr class="credit_row">
+       <td>
+	 {{ credit.group }}
+       </td>
+       <td>${{ credit.total_cost_of_dewars }}
+       </td>
+       <td>{{ credit.total_volume_recovered }} SCP
+       </td>
+       <td style="text-align: right">${{ credit.total_amount_credited }}
+       </td>
+     </tr>
+     {% endfor %}
+     </tbody>
+   </table>
+
+   <div class="align-right">
+     <span id="total_credits" class="bold">Total Credits: ${{ credits_total }}</span>
+   </div>
+   <div class="align-right" style="font-size: 1.1em; color: #900">
+     <span id="total_due" class="bold">Total Due: ${{ total_due }}</span>
+   </div>
+   {% endif %}{# end credit if #}
+
+   <h2>Expense Code Summary</h2>
+   <table id="ec_summary">
+     <thead>
+     <tr class="header_row">
+       <th>Expense Code</th>
+       <th>Amount Purchased</th>
+       <th>Amount Credited</th>
+       <th>Purchases less Credits</th>
+     </tr>
+     </thead>
+
+     <tbody>
+     {% for csm in credit_summary_manager %}
+     <tr class="cs_row">
+       <td>{{ csm.expense_code }}</td>
+       <td style="text-align: right">${{ csm.brs_total }}
+       </td>
+       <td style="text-align: right">${{ csm.total }}
+       </td>
+       <td style="text-align: right">${{ total_due }}
+       </td>
+     </tr>
+     {% endfor %}
+     </tbody>
+   </table>
+
    </div> <!-- end bill_content -->
    <br />
 

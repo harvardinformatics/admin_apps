@@ -27,11 +27,49 @@ import json
 from bs4 import BeautifulSoup
 import base64
 import cStringIO
+from decimal import Decimal
+
+class CreditSummaryAdder:
+    def __init__(self, expense_code):
+        self.expense_code = expense_code
+        self.credit_summary_list = []
+        self.billing_record_list = []
+        self.total = Decimal("0.0")
+        self.brs_total = Decimal("0.0")
+
+    def add_credit_summary(self, credit_summary):
+        self.credit_summary_list.append(credit_summary)
+        self.total += credit_summary.total_amount_credited
+
+    def add_billing_record(self, billing_record):
+        self.billing_record_list.append(billing_record)
+        self.brs_total += billing_record.amount
+
+class CreditSummaryManager:
+    def __init__(self):
+        self.credit_lu = {}  #{ payment_code: CreditSummaryAdder }
+    
+    def add_record(self, billing_record):
+        summary_adder = self.credit_lu.get(billing_record.payment_code, CreditSummaryAdder(expense_code=billing_record.payment_code))
+        if billing_record.payment_code not in self.credit_lu.keys():
+            summary_adder.add_credit_summary(billing_record.credit_summary)
+        summary_adder.add_billing_record(billing_record)
+        self.credit_lu.update({summary_adder.expense_code: summary_adder})
+        
+    def get_credit_summaries(self):
+        keys = self.credit_lu.keys()
+        keys.sort()
+        sorted_list = []
+        for k in keys:
+            sorted_list.append(self.credit_lu.get(k))
+        return sorted_list
 
 def get_br_context(request, filters=None):
     #get all bills
     dd = {}
-    brs = BillingRecord.objects.all().order_by('-bill_date')
+    #brs = BillingRecord.objects.all().order_by('-bill_date')
+    brs = BillingRecord.objects.select_related('credit_summary').all().order_by('-bill_date')
+    credit_summary_manager = CreditSummaryManager()
     display_filters = {}
 
     #initialize the year to be the current year.  If it shows up in the filters, use that instead.
@@ -55,7 +93,7 @@ def get_br_context(request, filters=None):
             display_filters.update({ 'month': value });
             month = int(value)
             if 'year' in filters.keys():
-                year = filters['year']
+                year = int(filters['year'])
             month_start = datetime(year, month, 1).replace(tzinfo=utc)
             display_filters.update({ 'month': month_start });
             next_month = month + 1
@@ -64,16 +102,33 @@ def get_br_context(request, filters=None):
                 year = year + 1
             month_end = datetime(year, next_month, 1).replace(tzinfo=utc)
             brs = brs.filter(bill_date__gte=month_start, bill_date__lt=month_end)
-    total = brs.aggregate(Sum('amount'))['amount__sum']
-    if not total:
-        total = 0
-    return Context({ 'brs': brs, 'total': total, 'display_filters': display_filters, })
+    brs_total = brs.aggregate(Sum('amount'))['amount__sum']
+
+    credits = []    
+    credits_total = 0.0
+    for br in brs:
+        credit_summary_manager.add_record(br)
+        if br.credit_summary not in credits:
+            credits.append(br.credit_summary)
+            credits_total += float([credit.total_amount_credited for credit in credits][0])
+
+    for csm in credit_summary_manager.get_credit_summaries():
+        print csm.__dict__
+
+    if not brs_total:
+        brs_total = 0.0
+    total_due = float(brs_total) - credits_total
+    return Context({ 'brs': brs, 'brs_total': brs_total, 'credit_summary_manager': credit_summary_manager.get_credit_summaries(), 
+                     'credits': credits, 'credits_total': credits_total, 'total_due': total_due, 
+                     'display_filters': display_filters, })
 
 @login_required
 @csrf_exempt
 def index(request):
     filters = check_querystring(request)
+    #print "filters: %s" % filters
     dd = get_br_context(request, filters)
+    #print "dd: %s" % dd
     template = 'billing/index.html'
     return render_to_response('billing/index.html', 
                               dd, 
@@ -98,7 +153,7 @@ def check_querystring(request):
         if key == "expense_code":
             filters.update({ key: value })
         if key == "ec_root":
-            #check to make sure expense code looks like this: 123-12345-4444-666666-123455-1234-13221
+            #check to make sure expense code root looks like this: 13221
             pattern = re.compile('(\d{5})')
             if pattern.match(value):
                 filters.update({ key: value })
