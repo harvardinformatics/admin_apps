@@ -147,7 +147,6 @@ Home Page.
    <a href="nofilters" class="filter">All</a>
    </div>
 
-   <div id="bill_content">
    <h1>Bill Listing{% if display_filters %} - 
        {% if display_filters.month %}
          {{ display_filters.month|date:"N" }},
@@ -158,13 +157,18 @@ Home Page.
        {% if display_filters.expense_code %}
          <br />Exp. Code: {{ display_filters.expense_code }}
        {% endif %}
+       {% if display_filters.group_name %}
+	 <br />Group: {{ display_filters.group_name }}
+       {% endif %}
        {% if display_filters.ec_root %}
          <br />Exp. Code Root: {{ display_filters.ec_root }}
        {% endif %}
+
        
      {% endif %}
    </h1>
 
+   <div id="bill_content" year="{{ display_filters.year }}" month="{{ display_filters.month|date:'n' }}" ec_root="{{ display_filters.ec_root }}" group_name="{{ display_filters.group_name }}">
    <h2>Helium Purchases</h2>
 
    <table id="billing_record_list">
@@ -260,7 +264,7 @@ Home Page.
      {% endfor %}
      </tbody>
    </table>
-
+   
    </div> <!-- end bill_content -->
    <br />
 
