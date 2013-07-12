@@ -48,8 +48,8 @@ class CreditSummaryAdder:
         self.brs_total += billing_record.amount
 
     def set_credit_apportion(self, all_bills, all_credits):
-        self.credit_apportion = round(Decimal(all_credits) * (self.brs_total / Decimal(all_bills)), 2)
-        self.brs_less_credits = round(Decimal(self.brs_total) - Decimal(self.credit_apportion), 2)
+        self.credit_apportion = round(Decimal("%s" % all_credits) * (Decimal("%s" % self.brs_total) / Decimal("%s" % all_bills)), 2)
+        self.brs_less_credits = round(Decimal("%s" % self.brs_total) - Decimal("%s" % self.credit_apportion), 2)
 
 class CreditSummaryManager:
     def __init__(self):
