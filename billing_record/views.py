@@ -36,6 +36,8 @@ class CreditSummaryAdder:
         self.billing_record_list = []
         self.total = Decimal("0.0")
         self.brs_total = Decimal("0.0")
+        self.credit_apportion = Decimal("0.0")
+        self.brs_less_credits = Decimal("0.0")
 
     def add_credit_summary(self, credit_summary):
         self.credit_summary_list.append(credit_summary)
@@ -44,6 +46,10 @@ class CreditSummaryAdder:
     def add_billing_record(self, billing_record):
         self.billing_record_list.append(billing_record)
         self.brs_total += billing_record.amount
+
+    def set_credit_apportion(self, all_bills, all_credits):
+        self.credit_apportion = round(Decimal(all_credits) * (self.brs_total / Decimal(all_bills)), 2)
+        self.brs_less_credits = round(Decimal(self.brs_total) - Decimal(self.credit_apportion), 2)
 
 class CreditSummaryManager:
     def __init__(self):
@@ -115,7 +121,8 @@ def get_br_context(request, filters=None):
             credits_total += float([credit.total_amount_credited for credit in credits][0])
 
     for csm in credit_summary_manager.get_credit_summaries():
-        print csm.__dict__
+        csm.set_credit_apportion(brs_total, credits_total)
+        #print csm.__dict__
 
     if not brs_total:
         brs_total = 0.0
