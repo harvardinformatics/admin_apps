@@ -144,7 +144,7 @@ Home Page.
    <!-- <a href="/billing/">Current Year</a> | -->
    <a href="year=2013" class="filter">2013</a> |
    <a href="year=2014" class="filter">2014</a> |
-   <a href="nofilters" class="filter">All</a>
+   <a href="/billing/">All</a>
    </div>
 
    <h1>Bill Listing{% if display_filters %} - 
@@ -197,7 +197,6 @@ Home Page.
      {% endfor %}
      </tbody>
    </table>
-   <div class="float-left">*26.625 scf gaseous helium = 1 liter of liquid helium</div>
    
    <div class="align-right">
      <span id="total_purchases" class="bold">Total Purchases: ${{ brs_total }}</span>
@@ -231,7 +230,7 @@ Home Page.
      {% endfor %}
      </tbody>
    </table>
-   <div class="float-left">*Credits applied according to charged distribution</div>
+   <div class="float-left">*26.625 scf gaseous helium = 1 liter of liquid helium</div>
 
    <div class="align-right">
      <span id="total_credits" class="bold">Total Credits: ${{ credits_total }}</span>
@@ -266,7 +265,8 @@ Home Page.
      {% endfor %}
      </tbody>
    </table>
-   
+   <div class="float-left">*Credits applied according to charged distribution</div>   
+
    </div> <!-- end bill_content -->
    <br />
 
