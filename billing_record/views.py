@@ -83,6 +83,8 @@ def get_br_context(request, filters=None):
         if key == 'ec_root':
             display_filters.update({ 'ec_root': value });
             brs = brs.filter(payment_code__endswith=value)
+            group_name = brs[0].name
+            display_filters.update({ 'group_name': group_name });
         if key == 'year':
             display_filters.update({ 'year': value });
             year = int(value)
