@@ -241,25 +241,24 @@ def create_doc(request):
     user_uri = user_info[0]['resource_uri']
     
     #construct the name
-    name_list = []
-    if 'year' in request.GET:
-        year = int(request.GET['year'])
-        name_list.append(date(year, 1, 1).strftime("%Y"))
-    else:
-        name_list.append(date.today().strftime("%Y"))
+    name = "HUHeib-"
     month = None
     bill_month = date(date.today().year, date.today().month, 1)
     if 'month' in request.GET:
         month = int(request.GET['month'])
         bill_month = date(date.today().year, month, 1)
-        name_list.append(bill_month.strftime("%m"))
+        name += bill_month.strftime("%m")
+    if 'year' in request.GET:
+        year = int(request.GET['year'])
+        name += date(year, 1, 1).strftime("%y")
+    else:
+        name += date.today().strftime("%y")
     if 'expense_code' in request.GET:
-        name_list.append("%s" % request.GET['expense_code'])
+        name += "-%s" % request.GET['expense_code']
     ec_root = None
     if 'ec_root' in request.GET:
         ec_root = request.GET['ec_root']
-        name_list.append("%s" % ec_root)
-    name = '-'.join([v for v in name_list])
+        name += "-%s" % ec_root
 
     #get the last version number from the document with this name
     doc_version = get_doc_version_by_name(name, user_info, username, password)
