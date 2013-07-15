@@ -80,6 +80,8 @@ def get_br_context(request, filters=None):
 
     #initialize the year to be the current year.  If it shows up in the filters, use that instead.
     year = datetime.now().replace(tzinfo=utc).year
+    if datetime.now().replace(tzinfo=utc).month > 6:
+        year = year + 1
     display_filters.update({ 'year': year });
     for key, value in filters.iteritems():
         if key == 'expense_code':
@@ -93,15 +95,21 @@ def get_br_context(request, filters=None):
             display_filters.update({ 'group_name': group_name });
         if key == 'year':
             display_filters.update({ 'year': value });
-            year = int(value)
-            year_start = datetime(year, 1, 1).replace(tzinfo=utc)
-            year_end = datetime(year + 1, 1, 1).replace(tzinfo=utc)
+            year = int(value) - 1
+            #display fiscal year
+            year_start = datetime(year, 7, 1).replace(tzinfo=utc)
+            year_end = datetime(year + 1, 7, 1).replace(tzinfo=utc)
+            #year_start = datetime(year, 1, 1).replace(tzinfo=utc)
+            #year_end = datetime(year + 1, 1, 1).replace(tzinfo=utc)
             brs = brs.filter(bill_date__gte=year_start, bill_date__lt=year_end)
         if key == 'month':
             display_filters.update({ 'month': value });
             month = int(value)
             if 'year' in filters.keys():
                 year = int(filters['year'])
+                if month > 6:
+                    #next year
+                    year = year + 1
             month_start = datetime(year, month, 1).replace(tzinfo=utc)
             display_filters.update({ 'month': month_start });
             next_month = month + 1
@@ -241,7 +249,7 @@ def create_doc(request):
     user_uri = user_info[0]['resource_uri']
     
     #construct the name
-    name = "HUHeib-"
+    name = "HuHeib-"
     month = None
     bill_month = date(date.today().year, date.today().month, 1)
     if 'month' in request.GET:

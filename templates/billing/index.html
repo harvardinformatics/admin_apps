@@ -129,7 +129,21 @@ Home Page.
    <div><a href="/logout/">Logout</a></div>
 
    <div class="align-right" style="margin-bottom: 1em;">
-   <a href="month=1" class="filter">Jan</a> |
+     Month: 
+     <a href="month=7" class="filter">1</a> |
+     <a href="month=8" class="filter">2</a> |
+     <a href="month=9" class="filter">3</a> |
+     <a href="month=10" class="filter">4</a> |
+     <a href="month=11" class="filter">5</a> |
+     <a href="month=12" class="filter">6</a> |
+     <a href="month=1" class="filter">7</a> |
+     <a href="month=2" class="filter">8</a> |
+     <a href="month=3" class="filter">9</a> |
+     <a href="month=4" class="filter">10</a> |
+     <a href="month=5" class="filter">11</a> |
+     <a href="month=6" class="filter">12</a> |
+
+   <!-- <a href="month=1" class="filter">Jan</a> |
    <a href="month=2" class="filter">Feb</a> |
    <a href="month=3" class="filter">Mar</a> |
    <a href="month=4" class="filter">Apr</a> |
@@ -140,11 +154,11 @@ Home Page.
    <a href="month=9" class="filter">Sep</a> |
    <a href="month=10" class="filter">Oct</a> |
    <a href="month=11" class="filter">Nov</a> |
-   <a href="month=12" class="filter">Dec</a> |
-   <!-- <a href="/billing/">Current Year</a> | -->
-   <a href="year=2013" class="filter">FY2014</a> |
-   <a href="year=2014" class="filter">FY2015</a> |
-   <a href="year=2015" class="filter">FY2016</a> |
+   <a href="month=12" class="filter">Dec</a> | -->
+   <a href="year=2013" class="filter">FY2013</a> |
+   <a href="year=2014" class="filter">FY2014</a> |
+   <a href="year=2015" class="filter">FY2015</a> |
+   <a href="year=2016" class="filter">FY2016</a> |
    <a href="/billing/">All</a>
    </div>
 
@@ -153,7 +167,7 @@ Home Page.
          {{ display_filters.month|date:"N" }},
        {% endif %}
        {% if display_filters.year %}
-         {{ display_filters.year }}
+         FY{{ display_filters.year }}
        {% endif %}
        {% if display_filters.expense_code %}
          <br />Exp. Code: {{ display_filters.expense_code }}
