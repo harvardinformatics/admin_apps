@@ -12,6 +12,9 @@ from billing_record.models import BillingRecord, CreditSummary
 from django.contrib.auth.models import User
 from decimal import Decimal
 
+import logging
+log = logging.getLogger(__name__)
+
 def get_records(month_string=None):
     all_additions = {}
     cs_added = []
@@ -112,8 +115,8 @@ def get_records(month_string=None):
     return all_additions
 
 if __name__ == '__main__':
-    aa = get_records()
-    print aa
+    output = get_records()
+    print output
     #print "Billing Records added: "
     #for br in brs:
     #    print "\t%s, %s, %s, %s" % (br.name, br.payment_code, br.bill_date, br.user)

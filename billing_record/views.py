@@ -83,6 +83,7 @@ def get_br_context(request, filters=None):
     if datetime.now().replace(tzinfo=utc).month > 6:
         year = year + 1
     display_filters.update({ 'year': year });
+
     for key, value in filters.iteritems():
         if key == 'expense_code':
             value = urllib.unquote_plus(value)
@@ -101,15 +102,18 @@ def get_br_context(request, filters=None):
             year_end = datetime(year + 1, 7, 1).replace(tzinfo=utc)
             #year_start = datetime(year, 1, 1).replace(tzinfo=utc)
             #year_end = datetime(year + 1, 1, 1).replace(tzinfo=utc)
+            log.debug("year_start: %s" % year_start)
+            log.debug("year_end: %s" % year_end)
             brs = brs.filter(bill_date__gte=year_start, bill_date__lt=year_end)
         if key == 'month':
             display_filters.update({ 'month': value });
             month = int(value)
+            log.debug(year)
+            log.debug(month)
             if 'year' in filters.keys():
-                year = int(filters['year'])
-                if month > 6:
-                    #next year
-                    year = year + 1
+                year = int(filters['year']) - 1
+            else:
+                year = datetime.now().replace(tzinfo=utc).year
             month_start = datetime(year, month, 1).replace(tzinfo=utc)
             display_filters.update({ 'month': month_start });
             next_month = month + 1
@@ -117,6 +121,9 @@ def get_br_context(request, filters=None):
                 next_month = 1
                 year = year + 1
             month_end = datetime(year, next_month, 1).replace(tzinfo=utc)
+
+            log.debug("month start: %s" % month_start)
+            log.debug("month end: %s" % month_end)
             brs = brs.filter(bill_date__gte=month_start, bill_date__lt=month_end)
     brs_total = brs.aggregate(Sum('amount'))['amount__sum']
 
@@ -125,8 +132,11 @@ def get_br_context(request, filters=None):
     for br in brs:
         credit_summary_manager.add_record(br)
         if br.credit_summary not in credits:
+            log.debug("credits: %s" % credits)
             credits.append(br.credit_summary)
+            log.debug("credits: %s" % credits)
             credits_total += float([credit.total_amount_credited for credit in credits][0])
+            log.debug(credits_total)
 
     for csm in credit_summary_manager.get_credit_summaries():
         csm.set_credit_apportion(brs_total, credits_total)
