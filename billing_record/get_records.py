@@ -73,9 +73,9 @@ def get_records(month_string=None):
                     credit_summary, created = CreditSummary.objects.get_or_create(name=credit_info['Billing_Notes'], 
                                                                                   group=credit_info['Group'],
                                                                                   total_amount_credited=credit_info['Total_Amount_Credited'],
-                                                                                  total_cost_of_dewars=credit_info['Total_Cost_Of_Dewars'],
+                                                                                  total_cost_of_dewars=str(credit_info['Total_Cost_Of_Dewars']),
                                                                                   total_volume_recovered=credit_info['Total_Volume_Recovered_(SCF)'],
-                                                                                  defaults={'month': month}
+                                                                                  defaults={ 'month': month }
                                                                                   )
                     if created:
                         cs_added.append(credit_summary)
@@ -93,7 +93,7 @@ def get_records(month_string=None):
                     if finalized:
                         name = item['Group']
                         payment_code = ": ".join(item['Expense_Code'].split('_:_'))
-                        amount = Decimal(item['Dewar_Cost'])
+                        amount = Decimal(str(item['Dewar_Cost']))
                         bill_date = datetime.strptime(item['Month'] + "-1", '%Y-%m-%d').replace(tzinfo=utc)
                         notes = item['Description'].replace("_", " ").replace("\\", "")\
                             .replace(" %", "%").replace("dollars credit", "dollar credit")
