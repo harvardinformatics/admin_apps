@@ -183,7 +183,7 @@ Home Page.
      {% endif %}
    </h1>
 
-   <div id="bill_content" year="{{ display_filters.year }}" month="{{ display_filters.month|date:'n' }}" ec_root="{{ display_filters.ec_root }}" group_name="{{ display_filters.group_name }}">
+   <div id="bill_content" year="{{ display_filters.real_year }}" month="{{ display_filters.month|date:'n' }}" ec_root="{{ display_filters.ec_root }}" group_name="{{ display_filters.group_name }}">
    <h2>Helium Purchases</h2>
 
    <table id="billing_record_list">
@@ -237,7 +237,7 @@ Home Page.
        </td>
        <td>${{ credit.total_cost_of_dewars }}
        </td>
-       <td>{{ credit.total_volume_recovered }} SCP
+       <td>{{ credit.total_volume_recovered }} SCF
        </td>
        <td style="text-align: right">${{ credit.total_amount_credited }}
        </td>
