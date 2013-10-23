@@ -175,6 +175,14 @@ def pdf(request):
 
 def check_querystring(request):
     filters = {}
+    if not request.GET:
+        #default to last month
+        today = datetime.date.today()
+        first = datetime.date(day=1, month=today.month, year=today.year)
+        lastMonth = first - datetime.timedelta(days=1)
+        filters.update({ 'year': lastMonth.year })
+        filters.update({ 'month': lastMonth.month })
+
     for key, value in request.GET.iteritems():
         if key == "expense_code":
             filters.update({ key: value })
@@ -193,6 +201,8 @@ def check_querystring(request):
             pattern = re.compile('(\d{1,2})')
             if pattern.match(value):
                 filters.update({ key: value })
+        if key == "all":
+            filters = {}
     return filters
 
 def get_user_info(username, password):
@@ -211,7 +221,7 @@ def get_user_info(username, password):
 
 def get_doc_version_by_name(doc_name, user_info, username, password):
     """
-    Users may create various versions with the same name, "XXXX-v01, XXXX-v02, etc."
+    Users may create various versions with the same name, "XXXX-001, XXXX-002, etc."
     """
     #get the user from dokken using tastypie
     doc_name = urllib.quote(doc_name)
@@ -228,13 +238,13 @@ def get_doc_version_by_name(doc_name, user_info, username, password):
     doc_info = json.loads(response.read())                   #read the string response and convert it to json object
     if doc_info['meta']['total_count']:
         doc_name = doc_info['objects'][0]['name']
-        matchObj = re.search( r'-v(\d+)', doc_name, re.M|re.I)
+        matchObj = re.search( r'-(\d{3})', doc_name, re.M|re.I)
         old_version = int(matchObj.group(1))
         new_version = old_version + 1
-        version_string = 'v%02d' % new_version
+        version_string = '%03d' % new_version
         return version_string    
-    #no matching objects, so default to v01
-    return "v01"
+    #no matching objects, so default to 001
+    return "001"
 
 
 @csrf_exempt
@@ -258,7 +268,7 @@ def create_doc(request):
     user_uri = user_info[0]['resource_uri']
     
     #construct the name
-    name = "HuHeib-"
+    name = "Huib-"
     month = None
     bill_month = date(date.today().year, date.today().month, 1)
     if 'month' in request.GET:
