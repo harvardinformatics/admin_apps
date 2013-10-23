@@ -129,7 +129,21 @@ Home Page.
    <div><a href="/logout/">Logout</a></div>
 
    <div class="align-right" style="margin-bottom: 1em;">
-   <a href="month=1" class="filter">Jan</a> |
+     Month: 
+     <a href="month=7" class="filter">1</a> |
+     <a href="month=8" class="filter">2</a> |
+     <a href="month=9" class="filter">3</a> |
+     <a href="month=10" class="filter">4</a> |
+     <a href="month=11" class="filter">5</a> |
+     <a href="month=12" class="filter">6</a> |
+     <a href="month=1" class="filter">7</a> |
+     <a href="month=2" class="filter">8</a> |
+     <a href="month=3" class="filter">9</a> |
+     <a href="month=4" class="filter">10</a> |
+     <a href="month=5" class="filter">11</a> |
+     <a href="month=6" class="filter">12</a> |
+
+   <!-- <a href="month=1" class="filter">Jan</a> |
    <a href="month=2" class="filter">Feb</a> |
    <a href="month=3" class="filter">Mar</a> |
    <a href="month=4" class="filter">Apr</a> |
@@ -140,11 +154,12 @@ Home Page.
    <a href="month=9" class="filter">Sep</a> |
    <a href="month=10" class="filter">Oct</a> |
    <a href="month=11" class="filter">Nov</a> |
-   <a href="month=12" class="filter">Dec</a> |
-   <!-- <a href="/billing/">Current Year</a> | -->
-   <a href="year=2013" class="filter">2013</a> |
-   <a href="year=2014" class="filter">2014</a> |
-   <a href="nofilters" class="filter">All</a>
+   <a href="month=12" class="filter">Dec</a> | -->
+   <a href="year=2013" class="filter">FY2013</a> |
+   <a href="year=2014" class="filter">FY2014</a> |
+   <a href="year=2015" class="filter">FY2015</a> |
+   <a href="year=2016" class="filter">FY2016</a> |
+   <a href="/billing/">All</a>
    </div>
 
    <h1>Bill Listing{% if display_filters %} - 
@@ -152,7 +167,7 @@ Home Page.
          {{ display_filters.month|date:"N" }},
        {% endif %}
        {% if display_filters.year %}
-         {{ display_filters.year }}
+         FY{{ display_filters.year }}
        {% endif %}
        {% if display_filters.expense_code %}
          <br />Exp. Code: {{ display_filters.expense_code }}
@@ -168,7 +183,7 @@ Home Page.
      {% endif %}
    </h1>
 
-   <div id="bill_content" year="{{ display_filters.year }}" month="{{ display_filters.month|date:'n' }}" ec_root="{{ display_filters.ec_root }}" group_name="{{ display_filters.group_name }}">
+   <div id="bill_content" year="{{ display_filters.real_year }}" month="{{ display_filters.month|date:'n' }}" ec_root="{{ display_filters.ec_root }}" group_name="{{ display_filters.group_name }}">
    <h2>Helium Purchases</h2>
 
    <table id="billing_record_list">
@@ -197,7 +212,6 @@ Home Page.
      {% endfor %}
      </tbody>
    </table>
-   <div class="float-left">*26.625 scf gaseous helium = 1 liter of liquid helium</div>
    
    <div class="align-right">
      <span id="total_purchases" class="bold">Total Purchases: ${{ brs_total }}</span>
@@ -223,7 +237,7 @@ Home Page.
        </td>
        <td>${{ credit.total_cost_of_dewars }}
        </td>
-       <td>{{ credit.total_volume_recovered }} SCP
+       <td>{{ credit.total_volume_recovered }} SCF
        </td>
        <td style="text-align: right">${{ credit.total_amount_credited }}
        </td>
@@ -231,7 +245,7 @@ Home Page.
      {% endfor %}
      </tbody>
    </table>
-   <div class="float-left">*Credits applied according to charged distribution</div>
+   <div class="float-left">*26.625 scf gaseous helium = 1 liter of liquid helium</div>
 
    <div class="align-right">
      <span id="total_credits" class="bold">Total Credits: ${{ credits_total }}</span>
@@ -246,9 +260,9 @@ Home Page.
      <thead>
      <tr class="header_row">
        <th>Expense Code</th>
-       <th>Amount Purchased</th>
+       <th>Amount Charged</th>
        <th>Amount Credited</th>
-       <th>Purchases less Credits</th>
+       <th>Total Charged</th>
      </tr>
      </thead>
 
@@ -258,15 +272,16 @@ Home Page.
        <td>{{ csm.expense_code }}</td>
        <td style="text-align: right">${{ csm.brs_total }}
        </td>
-       <td style="text-align: right">${{ csm.total }}
+       <td style="text-align: right">${{ csm.credit_apportion }}
        </td>
-       <td style="text-align: right">${{ total_due }}
+       <td style="text-align: right">${{ csm.brs_less_credits }}
        </td>
      </tr>
      {% endfor %}
      </tbody>
    </table>
-   
+   <div class="float-left">*Credits applied according to charged distribution</div>   
+
    </div> <!-- end bill_content -->
    <br />
 

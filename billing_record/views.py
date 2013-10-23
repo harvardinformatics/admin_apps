@@ -87,6 +87,9 @@ def get_br_context(request, filters=None):
     display_filters.update({ 'year': year });
 
     for key, value in filters.iteritems():
+        if key == 'all':
+            value = urllib.unquote_plus(value)
+            display_filters.update({ 'all': value });
         if key == 'expense_code':
             value = urllib.unquote_plus(value)
             display_filters.update({ 'expense_code': value });
@@ -175,15 +178,9 @@ def pdf(request):
 
 def check_querystring(request):
     filters = {}
-    if not request.GET:
-        #default to last month
-        today = datetime.date.today()
-        first = datetime.date(day=1, month=today.month, year=today.year)
-        lastMonth = first - datetime.timedelta(days=1)
-        filters.update({ 'year': lastMonth.year })
-        filters.update({ 'month': lastMonth.month })
-
     for key, value in request.GET.iteritems():
+        if key == "all":
+            filters.update({ key: value })
         if key == "expense_code":
             filters.update({ key: value })
         if key == "ec_root":
@@ -201,8 +198,6 @@ def check_querystring(request):
             pattern = re.compile('(\d{1,2})')
             if pattern.match(value):
                 filters.update({ key: value })
-        if key == "all":
-            filters = {}
     return filters
 
 def get_user_info(username, password):
