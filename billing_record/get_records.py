@@ -44,7 +44,7 @@ def get_records(month_string=None):
         url_string = "?".join([external_source, month_string])
         h = httplib2.Http()
         resp, content = h.request(url_string, "GET")
-        
+
         try:
             resp['status'] == '200'
         except:

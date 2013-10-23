@@ -80,6 +80,8 @@ def get_br_context(request, filters=None):
 
     #initialize the year to be the current year.  If it shows up in the filters, use that instead.
     year = datetime.now().replace(tzinfo=utc).year
+    real_year = year
+    display_filters.update({ 'real_year': real_year });
     if datetime.now().replace(tzinfo=utc).month > 6:
         year = year + 1
     display_filters.update({ 'year': year });
@@ -96,6 +98,7 @@ def get_br_context(request, filters=None):
             display_filters.update({ 'group_name': group_name });
         if key == 'year':
             display_filters.update({ 'year': value });
+            display_filters.update({ 'real_year': real_year });
             year = int(value) - 1
             #display fiscal year
             year_start = datetime(year, 7, 1).replace(tzinfo=utc)
@@ -264,6 +267,8 @@ def create_doc(request):
         name += bill_month.strftime("%m")
     if 'year' in request.GET:
         year = int(request.GET['year'])
+        if month and month >= 7:
+            year = year - 1  #get year is fiscal year
         name += date(year, 1, 1).strftime("%y")
     else:
         name += date.today().strftime("%y")
