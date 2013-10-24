@@ -233,7 +233,7 @@ def get_doc_version_by_name(doc_name, user_info, username, password):
     doc_info = json.loads(response.read())                   #read the string response and convert it to json object
     if doc_info['meta']['total_count']:
         doc_name = doc_info['objects'][0]['name']
-        matchObj = re.search( r'-(\d{3})', doc_name, re.M|re.I)
+        matchObj = re.findall( r'-(\d{3})', doc_name, re.M|re.I)[-1]
         old_version = int(matchObj.group(1))
         new_version = old_version + 1
         version_string = '%03d' % new_version
