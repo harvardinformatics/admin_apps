@@ -282,7 +282,8 @@ def create_doc(request):
     ec_root = None
     if 'ec_root' in request.GET:
         ec_root = request.GET['ec_root']
-        name += "-%s" % ec_root
+    # Remove ec_root from document name
+    #    name += "-%s" % ec_root
 
     #get the last version number from the document with this name
     doc_version = get_doc_version_by_name(name, user_info, username, password)
